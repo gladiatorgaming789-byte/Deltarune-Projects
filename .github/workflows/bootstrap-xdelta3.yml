@@ -1,0 +1,54 @@
+name: Bootstrap xdelta3 for merge workspace
+
+on:
+  push:
+    branches:
+      - merged-mods
+    paths:
+      - .github/workflows/bootstrap-xdelta3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  export-xdelta3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out merged-mods
+        uses: actions/checkout@v4
+        with:
+          ref: merged-mods
+
+      - name: Install xdelta3
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xdelta3
+
+      - name: Export executable as text chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          out_dir=".merge-tools/xdelta3-base64"
+          rm -rf "$out_dir"
+          mkdir -p "$out_dir"
+          binary="$(command -v xdelta3)"
+          cp "$binary" /tmp/xdelta3
+          {
+            echo "format=base64-chunks"
+            echo "chunk_width=8000"
+            echo "size=$(stat -c %s /tmp/xdelta3)"
+            echo "sha256=$(sha256sum /tmp/xdelta3 | awk '{print $1}')"
+            echo "version=$(xdelta3 -V 2>&1 | head -n 1)"
+          } > "$out_dir/manifest.txt"
+          base64 -w 0 /tmp/xdelta3 | fold -w 8000 | split -d -a 3 - "$out_dir/chunk-"
+          for file in "$out_dir"/chunk-*; do mv "$file" "$file.txt"; done
+
+      - name: Commit exported chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .merge-tools/xdelta3-base64
+          git commit -m "chore: bootstrap xdelta3 merge tool"
+          git push origin HEAD:merged-mods
