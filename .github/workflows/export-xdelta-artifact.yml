@@ -1,0 +1,32 @@
+name: Export xdelta artifact
+
+on:
+  push:
+    branches:
+      - merged-mods
+    paths:
+      - .github/workflows/export-xdelta-artifact.yml
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: merged-mods
+
+      - name: Reconstruct and verify xdelta3
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          tr -d '\r\n' < .merge-tools/xdelta3-base64/chunk-000.txt | base64 -d > artifact/xdelta3
+          chmod +x artifact/xdelta3
+          echo 'dc6bdc6ee86b2b3e389c937610c0b2508e31ca53c197de6f9c176909c546a846  artifact/xdelta3' | sha256sum -c -
+          artifact/xdelta3 -V
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xdelta3-linux-x86_64
+          path: artifact/xdelta3
+          if-no-files-found: error
