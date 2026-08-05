@@ -1,0 +1,44 @@
+name: Split xdelta bootstrap chunks
+
+on:
+  push:
+    branches:
+      - merged-mods
+    paths:
+      - .github/workflows/split-xdelta-chunks.yml
+
+permissions:
+  contents: write
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: merged-mods
+
+      - name: Split encoded xdelta into small files
+        shell: bash
+        run: |
+          set -euo pipefail
+          src=.merge-tools/xdelta3-base64/chunk-000.txt
+          out=.merge-tools/xdelta3-small
+          test -f "$src"
+          rm -rf "$out"
+          mkdir -p "$out"
+          tr -d '\r\n' < "$src" > /tmp/xdelta3.b64
+          split -b 6000 -d -a 3 --additional-suffix=.txt /tmp/xdelta3.b64 "$out/chunk-"
+          printf 'count=%s\n' "$(find "$out" -type f -name 'chunk-*.txt' | wc -l)" > "$out/manifest.txt"
+          printf 'encoded_size=%s\n' "$(wc -c < /tmp/xdelta3.b64)" >> "$out/manifest.txt"
+          printf 'binary_sha256=dc6bdc6ee86b2b3e389c937610c0b2508e31ca53c197de6f9c176909c546a846\n' >> "$out/manifest.txt"
+
+      - name: Commit small chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .merge-tools/xdelta3-small
+          git commit -m "chore: split xdelta bootstrap chunks"
+          git push origin HEAD:merged-mods
