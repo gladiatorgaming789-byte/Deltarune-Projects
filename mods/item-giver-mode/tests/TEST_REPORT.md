@@ -1,11 +1,14 @@
-# Item Giver Mode — Test Report
+# Item Giver Mode v0.1.1 — Test Report
+
+## Change under test
+
+Version 0.1.1 changes the open/close hotkey from **F8** to **F7** because Medal commonly reserves F8 for clipping and can intercept it before DELTARUNE receives the input.
 
 ## Environment
 
 - UndertaleModTool CLI 0.9.1.2 for Ubuntu
 - Deltamod-compatible CSX package structure
-- Debug Mode v4.01
-- Secret Boss Challenge v0.4.0
+- Debug Mode v4.01 shortcut audit
 - Supplied DELTARUNE Windows full-release files, launcher version `v23`
 
 ## Clean source checksums
@@ -16,80 +19,49 @@
 - Chapter 4: `ed64789586238b52375e994e1c1cf13694dd2d0dab57d13e639b9c892e37d8f2`
 - Chapter 5: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
-## Feature implementation
+## Compilation
 
-Each chapter patch adds one persistent `obj_item_giver` object with:
-
-- Create event containing the dynamic category scanners and preview helpers.
-- Step event containing F8 toggle, keyboard navigation, refresh, inventory-full handling, and native grant calls.
-- Draw GUI event containing the item browser and status display.
-- Clean Up event restoring the previous interaction state.
-
-`scr_gamestart` receives an idempotent instance-creation append guarded by `instance_exists`.
-
-The runtime scanner uses the chapter’s own `scr_iteminfo`, `scr_weaponinfo`, `scr_armorinfo`, `scr_keyiteminfo`, and `scr_litemname` definitions. It scans IDs 1–255 and includes only nonblank names.
-
-## Compilation and round-trip checks
-
-All five clean chapter files:
-
-1. Loaded successfully in UndertaleModTool.
-2. Applied their matching Item Giver CSX script.
-3. Compiled and wrote successfully.
-4. Reopened successfully.
-5. Round-trip decompiled all four new object events.
-6. Confirmed the F8 handler, native grant functions, and guarded `scr_gamestart` creation code remained present.
+The v0.1.1 CSX script compiled and wrote successfully against all five clean chapter files.
 
 Rebuilt SHA-256 values:
 
-- Chapter 1: `2a304c0ba4aa197ca4f9dfc8f9916cce8fbeb1160a956b1b7e623a8a5daaf56b`
-- Chapter 2: `c54a0019a4bd21eb68b3752e357c7521368c7f3bd2db94f0b18523eb52c48770`
-- Chapter 3: `e9bae5c69a2c169125f81d4b98797ce721052b30b630146e0dd73c3d940fa938`
-- Chapter 4: `1bdaa7e1167a19374bc7dc99d271f40d93aba6afec6413cff0ef9d351e90cf59`
-- Chapter 5: `7eed70a2e825b7f9f28cc17253c0e43a2620e60a078e0d3343f48f264b355a5a`
+- Chapter 1: `7ecea26649ae6c3d91587f9b692995701df8f807d173bf18a0f2e6155410585c`
+- Chapter 2: `8be59276a7e7bf77435369d064ff7f5311a0326c198a59a61100be0ce1c0dbdf`
+- Chapter 3: `c86e3b0e8d39162c6e45ea43d2bedc4ae24c55a77ac6e5545d3da3f1f77531fd`
+- Chapter 4: `1797e98b02f72e2f4e0d35c7785b1fd0e36edbd80095229fa36a78bc70209c46`
+- Chapter 5: `7e11d8ee17af943df9aadbe09d1c2286422df9f9503461a2cbd3878b26e35cdd`
+
+## Hotkey verification
+
+Chapter 1 was reopened and the new object events were round-trip decompiled.
+
+- `gml_Object_obj_item_giver_Step_0` contains `keyboard_check_pressed(vk_f7)` for opening and closing.
+- `gml_Object_obj_item_giver_Draw_64` displays `X/Esc/F7: Close`.
+- No `vk_f8` or F8 menu labels remain in the package source.
+- Debug Mode v4.01's supplied scripts use F2, F5, F6, and F10 for their function-key shortcuts and contain no F7 shortcut.
 
 ## Idempotency
 
-The matching Item Giver script was applied a second time to every rebuilt chapter. The second output was byte-identical to the first output in Chapters 1–5.
-
-## Debug Mode v4.01 compatibility
-
-Both patch orders compiled successfully for every chapter:
-
-1. Clean chapter → Debug Mode → Item Giver Mode
-2. Clean chapter → Item Giver Mode → Debug Mode
-
-The resulting files retained the Item Giver object, F8 input handler, native grant calls, and guarded startup creation. Debug Mode’s own changes also compiled in both orders.
-
-## Secret Boss Challenge v0.4.0 compatibility
-
-Both patch orders compiled successfully in Chapters 1, 2, and 5:
-
-1. Clean chapter → Secret Boss Challenge → Item Giver Mode
-2. Clean chapter → Item Giver Mode → Secret Boss Challenge
-
-Chapter 5 round-trip checks confirmed both outputs retained:
-
-- Item Giver’s weapon grant path
-- Pink Scarf
-- Pink’s Staff
-- Shield-related Pink Scarf data
-
-Because the item list is generated at runtime from the final weapon table, the challenge mod’s named equipment is included when both mods are installed.
+The matching v0.1.1 script was applied a second time to every rebuilt chapter. The second output was byte-identical to the first output in Chapters 1–5.
 
 ## Package validation
 
 - `meta.json` parses as valid JSON.
-- Version is `0.1.0`.
+- Version is `0.1.1`.
 - Package ID is `github.itemgivermode.gladiatorgaming`.
 - `neededFiles` contains all five verified clean chapter hashes.
 - `modding.xml` contains five `type="csx"` routes.
 - Every referenced patch exists.
 - Required files are at the ZIP root.
 - ZIP central-directory and compressed-data integrity checks passed.
-- Scripts extracted from the final ZIP reproduced the tested chapter outputs byte-for-byte.
-- No original game binaries, `data.win` files, music, or full decompiled source are included.
+- Extracted files are byte-identical to the tested source files.
+- ZIP size: `19117` bytes.
+- ZIP SHA-256: `b5c53fe5fad375d1de7ec8527d51c109d603eed2984744d83feea247696bebb9`.
+
+## Continuing validation from v0.1.0
+
+The underlying menu, grant paths, startup hook, and object name are unchanged from v0.1.0. That release compiled in both patch orders with Debug Mode v4.01 across Chapters 1–5 and with Secret Boss Challenge v0.4.0 in Chapters 1, 2, and 5.
 
 ## Not completed
 
-A full manual playthrough selecting every listed entry, every inventory-full permutation, and every plot-sensitive key item was not performed in the headless workspace. The mod was validated through source inspection, successful compilation, round-trip decompilation, idempotency testing, and cross-mod patch-order testing. Wine prefix initialization did not complete reliably in this workspace, so no additional launch smoke result is claimed for this release.
+A manual in-game keypress test could not be automated in the headless workspace. The F7 handler was verified in the compiled and decompiled game code, and the original F8 conflict was identified by the user as Medal's clipping shortcut.
