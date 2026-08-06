@@ -17,8 +17,8 @@ Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
 Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 
-- Latest tested release: `Item_Giver_Mode_v0.1.0_Deltamod.zip`; its exact package contents are mirrored in [`release/`](item-giver-mode/release/).
-- Adds an F8 debug-style item browser to Chapters 1–5.
+- Latest tested release: `Item_Giver_Mode_v0.1.1_Deltamod.zip`; reproducible package source is mirrored in [`release/`](item-giver-mode/release/).
+- Adds an F7 debug-style item browser to Chapters 1–5.
 - Supports consumable items, weapons, armor, key items, and Light World items.
 - Reads the final item tables at runtime, allowing named items from compatible mods to appear.
 - Includes source CSX patches, metadata, license, and a validation report.
