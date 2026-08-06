@@ -4,25 +4,19 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 ## Current release
 
-**Version 1.0.2 — Chapter 1 asset-link hotfix**
+**Version 1.0.3 — Shared Custom Difficulty asset-link hotfix**
 
-SHA-256: `bbb558404c5257af7e609d5e69a1167df905b684ac95ef6811d860c5e812a9cc`
+SHA-256: `5d61f39dc62452152e214e3f8597b6f902e988dc644d01bc792278c6c404ed2a`
 
 ### Hotfix changes
 
-- Fixed the Chapter 1 startup crash for `spr_numbersfontbig_gold`.
-- Root cause: the Modernized sprites and sounds existed in the final file, but eight scripts had been compiled before those newly added resources were imported. GameMaker therefore compiled names such as `spr_numbersfontbig_gold` as instance-variable reads (`self.spr_numbersfontbig_gold`) instead of asset constants.
-- Recompiled all eight affected scripts after the resources were loaded:
-  - `gml_Object_obj_battleblcon_Draw_0`
-  - `gml_GlobalScript_scr_miniface_init_clover`
-  - `gml_Object_obj_initializer2_Create_0`
-  - `gml_Object_obj_initializer2_Other_72`
-  - `gml_Object_obj_initializer_Create_0`
-  - `gml_Object_obj_pacifyspell_Step_0`
-  - `gml_Object_obj_dkris_event_Draw_0`
-  - `gml_GlobalScript_scr_mercyadd`
-- Correctly linked the affected Modernized sprites and sounds, including `spr_numbersfontbig_gold`, `spr_spare_z`, `spr_battleblcon_parts`, Clover face sprites, wheelbarrow parts, `snd_mercyadd`, and `snd_pacify`.
-- Preserves the Better Saves sprite and INI-context fixes from version 1.0.1.
+- Fixed the `obj_darkcontroller` Draw crash affecting Chapters 1–5.
+- Imported Custom Difficulty's two missing dark-world menu sprites into every chapter:
+  - `spr_darkmodsbt`
+  - `spr_darkmodsfade`
+- Recompiled `gml_Object_obj_darkcontroller_Draw_0` after those sprites were loaded, so both names are linked sprite constants rather than unresolved instance-variable reads.
+- Recompiled Chapter 1's `gml_Object_obj_tensionbar_Draw_0` to correctly link the remaining Modernized sprite `spr_tensionbar_cutout`.
+- Preserves the Better Saves sprite/INI-context fixes from version 1.0.1 and the Chapter 1 Modernized asset relinking from version 1.0.2.
 
 ## Fully merged
 
@@ -48,9 +42,10 @@ The `pink.ogg` override is included. The visual `data.win` patch is not included
 
 ## Validation
 
-- Chapter 1 was freshly reopened with UndertaleModTool CLI.
-- Nineteen targeted Modernized and Better Saves asset references were checked at bytecode level and confirmed linked as asset constants rather than unresolved instance variables.
-- Every version 1.0.2 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
-- The packaged ZIP was extracted, its internal hashes were checked, and all six patches were tested again from the packaged copies.
+- Chapters 1–5 were freshly reopened with UndertaleModTool CLI.
+- Every asset added by Better Saves, Custom Difficulty, and Chapter 1 Modernized was confirmed present.
+- Bytecode contains zero unresolved variable-style references to those added assets.
+- Every version 1.0.3 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
+- The packaged ZIP was extracted, all internal hashes were checked, and all six patches were tested again from the packaged copies.
 
 Windows runtime testing remains recommended, especially save-slot operations, difficulty selection, Knight ACTs, and timing-sensitive attacks.
