@@ -2,59 +2,70 @@
 
 > Central archive for completed DELTARUNE modding projects maintained by GladiatorGaming.
 
-All releases in this branch are organized by project type and must be packaged for **Deltamod** whenever an installable build is available. Development and testing happen in the workspace; only completed, documented, and validated projects belong here.
+All completed work is organized by project type. Installable builds must remain compatible with **Deltamod**. Development and testing happen in the current workspace; finished, documented, and validated projects are published here.
 
 ## Browse the archive
 
 | Category | Purpose |
 |---|---|
 | [Mods](mods/README.md) | Original standalone mods. |
-| [Merged Mods](merged%20mods/README.md) | Compatibility builds that combine two or more existing mods. |
-| [Compatibility Fixed Mods](compatibility%20fixed%20mods/README.md) | Existing mods updated for newer DELTARUNE versions or repaired for Deltamod. |
+| [Merged Mods](merged%20mods/README.md) | Compatibility builds combining two or more existing mods. |
+| [Compatibility Fixed Mods](compatibility%20fixed%20mods/README.md) | Existing mods repaired or updated for newer DELTARUNE builds. |
 
-## Published projects
+## Completed projects
 
-### Mods
+### Standalone mods
 
-- [Secret Boss Challenge](mods/secret-boss-challenge/README.md) — Deltamod release packages, documentation, license, and validation report.
+- [Secret Boss Challenge](mods/secret-boss-challenge/README.md)
+  - Versioned Deltamod ZIP releases
+  - Source/project documentation
+  - License and tests
 
-### Merged Mods
+### Merged mods
 
-- [DELTARUNE Compatibility Merge](merged%20mods/deltarune-compatibility-merge/README.md) — completed merge documentation and validation notes. A release ZIP is not currently stored in the repository, so the project is archived as a folder.
+- [DELTARUNE Compatibility Merge](merged%20mods/deltarune-compatibility-merge/README.md)
+  - Current version: **1.0.7**
+  - Package metadata and Deltamod patch map
+  - Exact source, patch, override, and output hashes
+  - Binary payload manifest
+  - Source-mod credits and compatibility decisions
+  - Complete changelog and validation report
+  - The validated binary ZIP remains in the current workspace because the connected GitHub writer cannot transfer the 14 MB artifact; the project is preserved here as a folder.
 
 ## Branch guide
 
 | Branch | Responsibility |
 |---|---|
 | `all-projects` | Completed and validated project archive. |
-| `mod-development` | Source history for original standalone mods. |
-| `merged-mods` | Source history for merged compatibility builds. |
-| `compatibility-fixes` | Source history for repaired or updated mods. |
+| `mod-development` | Development history for original standalone mods. |
+| `merged-mods` | Historical development branch for merged compatibility builds. |
+| `compatibility-fixes` | Development history for repaired or updated mods. |
 
 ## Publishing requirements
 
-A project should be added to this branch only when it includes the materials currently available for that completed project:
+A project belongs here when it includes the materials available for the completed work:
 
-- A Deltamod-compatible release package when a distributable archive exists.
-- A project README with features, installation or availability notes, compatibility information, known limitations, and credits.
-- Source patch scripts or other redistributable development files when appropriate and available.
-- A validation or test report, or documented validation results.
-- A clear version number and identifiable latest release when an installable package exists.
+- A Deltamod-compatible release archive when the connected writer can transfer it.
+- Otherwise, a complete project folder with metadata, manifests, validation, credits, and exact release hashes.
+- A README with features, compatibility information, known limitations, and installation or availability notes.
+- Source patch scripts or other redistributable development files when available.
+- A validation or test report.
+- A clear latest version.
 
 ## Repository rules
 
 - Put original standalone mods under `mods/`.
 - Put merged builds under `merged mods/`.
 - Put repaired or updated existing mods under `compatibility fixed mods/`.
-- Keep each project in its own folder within the correct category.
-- Update an existing project in place instead of creating duplicate folders.
-- Development, compilation, and testing happen in the workspace rather than temporary GitHub branches.
-- Preserve original authorship and licensing information for repaired or merged mods.
-- Do not commit original DELTARUNE executables, `data.win` files, music, or other copyrighted game assets.
+- Keep each project in its own folder.
+- Update an existing project in place rather than creating duplicates.
+- Work in the current workspace and publish only completed results here.
+- Preserve original authorship and licensing information.
+- Do not commit original DELTARUNE executables, complete `data.win` files, or other unmodified game files.
 
 ## Deltamod compatibility
 
-Every installable mod and merged build must work through Deltamod and use patching methods that can coexist with other compatible packages whenever possible. Projects that modify the same resources must document conflicts or provide a dedicated merged build.
+Every installable mod and merged build must work through Deltamod. Projects modifying overlapping resources must document conflicts or provide a dedicated merged build.
 
 ---
 

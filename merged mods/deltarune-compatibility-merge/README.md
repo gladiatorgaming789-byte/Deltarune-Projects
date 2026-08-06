@@ -6,22 +6,11 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 **Version 1.0.7 — Graze sprite canvas hotfix**
 
-SHA-256: `f6d0fa4ed8328b283f47fc95ebb5ff0c2c17527bede19a56c2c5bacf1f3e3b61`
+- Workspace archive: `DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip`
+- ZIP SHA-256: `f6d0fa4ed8328b283f47fc95ebb5ff0c2c17527bede19a56c2c5bacf1f3e3b61`
+- Deltamod package ID: `gladiatorgaming.deltarune.compatibilitymerge`
 
-### Hotfix changes
-
-- Fixed the cut-off bottom point on `spr_bhero_graze` in Chapters 2–4.
-- The sprite used a 99×90 canvas with `OriginY = 89`, and the visible heart point occupied the final row. With no transparent row below it, the point looked chopped off.
-- Expanded the logical sprite canvas and frame bounding height from 90 to 92 pixels.
-- Preserved the texture pixels, origin, collision margins, and draw position, so the sprite does not move or change collision behavior.
-- Verified the repaired sprite exports as 99×92 with visible alpha ending at row 89 and two transparent rows beneath it.
-- Preserves the Chapter 1 elevator cursor fix and the user-supplied Pink Fight `pink.ogg` from version 1.0.6.
-
-## Sprite audit
-
-- Chapter 1 Modernized and No-Hat imported frame PNGs and sprite metadata were compared against their donor files and match their intended donors.
-- The standard `spr_grazeappear` and `spr_grazemask` resources match the clean game.
-- `spr_bhero_graze` was the graze resource whose visible pixels reached the exact bottom canvas boundary.
+The project is archived here as a folder because the connected GitHub writer cannot transfer the 14 MB binary workspace ZIP. The repository contains the package control files, exact binary/output manifests, complete release history, credits, compatibility decisions, and validation results. See [`release/README.md`](release/README.md).
 
 ## Fully merged
 
@@ -29,16 +18,53 @@ SHA-256: `f6d0fa4ed8328b283f47fc95ebb5ff0c2c17527bede19a56c2c5bacf1f3e3b61`
 - Better Saves v7 — thej01
 - Deltarune 60 FPS 1.1.20 — BadArtAdventure
 - Deltarune Chapter 1 Modernized 1.1.0 — Qbix1234
-- Serif0S' No-Hat Ralsei Face Resprites 1.4 — Serif0S & theginger
+- No-Hat Ralsei 1.4 — Serif0S & theginger
 - New ACTs in the Knight Fight 2.7 — ToyBoyC
-  - Selected variant: Normal
+  - Selected variant: **Normal**
 
-## Improved Pink Fight Background
+The requested Pink Fight `pink.ogg` override is included in the validated workspace release. The visual Pink Background patch is excluded because it targets an incompatible legacy Chapter 5 source and forced application corrupts pointer-bearing GameMaker resources.
 
-The newly supplied `pink.ogg` override is included. The visual `data.win` patch is not included because the published patch requires Chapter 5 SHA-256 `7e3e9c4a0ef84f0129b6a1c9e9f81091e83abbafbf66eb09893c2082cf5618de`, while the supplied Chapter 5 file is `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`. Forced application produced invalid pointer-bearing GameMaker resources, so it was excluded rather than shipping corruption.
+## Latest changes
 
-## Validation
+Version 1.0.7 fixes the bottom clipping on `spr_bhero_graze` in Chapters 2–4 by expanding its logical canvas from 99×90 to 99×92. Its origin, collision margins, visible pixels, and draw position remain unchanged.
 
-- Chapters 2–4 were reopened with UndertaleModTool CLI and confirmed to contain `spr_bhero_graze` at height 92, origin Y 89, and frame bounding height 92.
-- Every v1.0.7 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
-- The packaged ZIP was extracted, every internal hash was checked, and all six patches were tested again from the packaged copies.
+Earlier hotfixes repaired:
+
+- Chapter 1 elevator-choice soul alignment;
+- Chapter 1 smart/random bullet target handling;
+- Better Saves sprite imports and INI lifetime handling;
+- Chapter 1 Modernized sprite and sound asset linking;
+- Custom Difficulty menu sprite linking;
+- the complete Better Saves Chapter 1 menu renderer.
+
+## Project files
+
+```text
+deltarune-compatibility-merge/
+├── README.md
+├── docs/
+│   ├── CHANGELOG.md
+│   ├── SOURCE-MODS.md
+│   └── VALIDATION.md
+├── package/
+│   ├── README.txt
+│   ├── __deltaID.json
+│   ├── checksums.txt
+│   ├── meta.json
+│   ├── modding.xml
+│   └── package-file-hashes.txt
+└── release/
+    ├── BINARY-MANIFEST.md
+    ├── README.md
+    └── SHA256SUMS.txt
+```
+
+## Validation summary
+
+- Launcher and Chapters 1–5 were reopened with UndertaleModTool during merge validation.
+- Every final xdelta was decoded against its exact clean source and compared byte-for-byte with the intended output.
+- The packaged ZIP was extracted and retested from its packaged patch copies.
+- Exact source hashes in `package/meta.json` prevent installation against unsupported game builds.
+- A complete beginning-to-end playthrough of every route and difficulty combination is not claimed.
+
+See [the detailed validation report](docs/VALIDATION.md) and [full changelog](docs/CHANGELOG.md).

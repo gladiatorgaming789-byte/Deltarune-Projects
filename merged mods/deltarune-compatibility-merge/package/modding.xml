@@ -1,0 +1,8 @@
+<patch type="xdelta" patch="./patches/launcher.xdelta" to="./data.win" />
+<patch type="xdelta" patch="./patches/chapter1.xdelta" to="./chapter1_windows/data.win" />
+<patch type="xdelta" patch="./patches/chapter2.xdelta" to="./chapter2_windows/data.win" />
+<patch type="xdelta" patch="./patches/chapter3.xdelta" to="./chapter3_windows/data.win" />
+<patch type="xdelta" patch="./patches/chapter4.xdelta" to="./chapter4_windows/data.win" />
+<patch type="xdelta" patch="./patches/chapter5.xdelta" to="./chapter5_windows/data.win" />
+<patch type="override" patch="./overrides/chapter1_windows/lang/lang_en.json" to="./chapter1_windows/lang/lang_en.json" />
+<patch type="override" patch="./overrides/mus/pink.ogg" to="./mus/pink.ogg" />
