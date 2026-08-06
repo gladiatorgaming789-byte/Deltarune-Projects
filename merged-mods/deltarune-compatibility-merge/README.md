@@ -4,19 +4,23 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 ## Current release
 
-**Version 1.0.3 — Shared Custom Difficulty asset-link hotfix**
+**Version 1.0.4 — Chapter 1 smart-target damage hotfix**
 
-SHA-256: `5d61f39dc62452152e214e3f8597b6f902e988dc644d01bc792278c6c404ed2a`
+SHA-256: `59d47e5fd86a0ea1bac1c32aa5c2176e98baf2a3def371a75375822f7a803f95`
 
 ### Hotfix changes
 
-- Fixed the `obj_darkcontroller` Draw crash affecting Chapters 1–5.
-- Imported Custom Difficulty's two missing dark-world menu sprites into every chapter:
-  - `spr_darkmodsbt`
-  - `spr_darkmodsfade`
-- Recompiled `gml_Object_obj_darkcontroller_Draw_0` after those sprites were loaded, so both names are linked sprite constants rather than unresolved instance-variable reads.
-- Recompiled Chapter 1's `gml_Object_obj_tensionbar_Draw_0` to correctly link the remaining Modernized sprite `spr_tensionbar_cutout`.
-- Preserves the Better Saves sprite/INI-context fixes from version 1.0.1 and the Chapter 1 Modernized asset relinking from version 1.0.2.
+- Fixed the Chapter 1 bullet-contact crash in `scr_damage`:
+  - `Variable Index [4] out of range [3] - charinstance`
+- Chapter 1 Modernized uses target value `4` as a smart/random-target marker. The original merge retained the newer `scr_randomtarget` behavior but omitted the corresponding `target == 4` conversion block, so bullets attempted to access `global.charinstance[4]` directly.
+- Restored the complete smart-target flow:
+  - choose a valid party member before reading `global.charinstance[target]`;
+  - preserve Modernized damage calculation and elemental damage reduction;
+  - preserve Custom Difficulty damage multipliers, down-state deficit, and iframe scaling;
+  - preserve Better Saves debug invulnerability support;
+  - restore the bullet's original target marker after damage processing.
+- Chapters 2–5 were checked and already contained their correct target-4 remapping, so their binaries remain unchanged.
+- Preserves the Better Saves and added-resource fixes from versions 1.0.1–1.0.3.
 
 ## Fully merged
 
@@ -42,10 +46,9 @@ The `pink.ogg` override is included. The visual `data.win` patch is not included
 
 ## Validation
 
-- Chapters 1–5 were freshly reopened with UndertaleModTool CLI.
-- Every asset added by Better Saves, Custom Difficulty, and Chapter 1 Modernized was confirmed present.
-- Bytecode contains zero unresolved variable-style references to those added assets.
-- Every version 1.0.3 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
-- The packaged ZIP was extracted, all internal hashes were checked, and all six patches were tested again from the packaged copies.
+- The repaired Chapter 1 file was freshly reopened with UndertaleModTool CLI.
+- `scr_damage` was decompiled from the saved output and confirmed to contain `target == 4` remapping, `__remtarget` restoration, Custom Difficulty damage/iframe logic, and Modernized element reduction.
+- Every version 1.0.4 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
+- The packaged ZIP was extracted, every internal hash was checked, and all six patches were tested again from the packaged copies.
 
-Windows runtime testing remains recommended, especially save-slot operations, difficulty selection, Knight ACTs, and timing-sensitive attacks.
+Windows runtime testing remains recommended, especially bullet damage in Chapter 1, save-slot operations, difficulty selection, Knight ACTs, and timing-sensitive attacks.
