@@ -19,11 +19,13 @@ if (!displayName.Contains("chapter 1") && !displayName.Contains("chapitre 1"))
     return;
 }
 
-if (Data.GameObjects.Any(x => x?.Name?.Content == "obj_item_giver"))
+const string marker = "__ITEM_GIVER_MODE_V013__";
+if (Data.Strings.Any(x => x?.Content == marker))
 {
-    ScriptMessage("Item Giver is already installed for Chapter 1.");
+    ScriptMessage("Item Giver v0.1.3 is already installed for Chapter 1.");
     return;
 }
+Data.Strings.MakeString(marker);
 
 GlobalDecompileContext globalDecompileContext = new(Data);
 IDecompileSettings decompilerSettings = new DecompileSettings();
@@ -32,138 +34,138 @@ UndertaleModLib.Compiler.CodeImportGroup importGroup = new(Data, globalDecompile
     ThrowOnNoOpFindReplace = true
 };
 
-UndertaleGameObject objItemGiver = new UndertaleGameObject();
-objItemGiver.Name = Data.Strings.MakeString("obj_item_giver");
-objItemGiver.Visible = true;
-objItemGiver.Persistent = true;
-objItemGiver.Awake = true;
-Data.GameObjects.Add(objItemGiver);
-
-importGroup.QueueReplace(objItemGiver.EventHandlerFor(EventType.Create, (uint)0, Data),
-@"depth = -999999;
-menu_open = false;
-lists_built = false;
-category = 0;
-selected = 0;
-status_text = """";
-status_timer = 0;
-status_ok = true;
-saved_interact = 0;
-category_names = [""ITEMS"", ""WEAPONS"", ""ARMOR"", ""KEY ITEMS"", ""LIGHT ITEMS""];
-item_ids = [];
-item_names = [];
-weapon_ids = [];
-weapon_names = [];
-armor_ids = [];
-armor_names = [];
-key_ids = [];
-key_names = [];
-light_ids = [];
-light_names = [];
-preview_id = -1;
-preview_name = """";
-preview_desc = """";
-preview_extra = """";
-
-get_count = function()
+UndertaleGameObject objTime = Data.GameObjects.ByName("obj_time");
+if (objTime == null)
 {
-    switch (category)
+    ScriptError("Item Giver could not find DELTARUNE's persistent obj_time controller.");
+    return;
+}
+
+importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Create, (uint)0, Data),
+@"ig_itemgiver_version = ""0.1.3"";
+ig_menu_open = false;
+ig_lists_built = false;
+ig_category = 0;
+ig_selected = 0;
+ig_status_text = """";
+ig_status_timer = 0;
+ig_status_ok = true;
+ig_saved_interact = 0;
+ig_category_names = [""ITEMS"", ""WEAPONS"", ""ARMOR"", ""KEY ITEMS"", ""LIGHT ITEMS""];
+ig_item_ids = [];
+ig_item_names = [];
+ig_weapon_ids = [];
+ig_weapon_names = [];
+ig_armor_ids = [];
+ig_armor_names = [];
+ig_key_ids = [];
+ig_key_names = [];
+ig_light_ids = [];
+ig_light_names = [];
+ig_preview_id = -1;
+ig_preview_name = """";
+ig_preview_desc = """";
+ig_preview_extra = """";
+
+ig_get_count = function()
+{
+    switch (ig_category)
     {
-        case 0: return array_length(item_ids);
-        case 1: return array_length(weapon_ids);
-        case 2: return array_length(armor_ids);
-        case 3: return array_length(key_ids);
-        case 4: return array_length(light_ids);
+        case 0: return array_length(ig_item_ids);
+        case 1: return array_length(ig_weapon_ids);
+        case 2: return array_length(ig_armor_ids);
+        case 3: return array_length(ig_key_ids);
+        case 4: return array_length(ig_light_ids);
     }
     return 0;
 };
 
-get_id = function(_index)
+ig_get_id = function(_index)
 {
-    switch (category)
+    switch (ig_category)
     {
-        case 0: return item_ids[_index];
-        case 1: return weapon_ids[_index];
-        case 2: return armor_ids[_index];
-        case 3: return key_ids[_index];
-        case 4: return light_ids[_index];
+        case 0: return ig_item_ids[_index];
+        case 1: return ig_weapon_ids[_index];
+        case 2: return ig_armor_ids[_index];
+        case 3: return ig_key_ids[_index];
+        case 4: return ig_light_ids[_index];
     }
     return -1;
 };
 
-get_name = function(_index)
+ig_get_name = function(_index)
 {
-    switch (category)
+    switch (ig_category)
     {
-        case 0: return item_names[_index];
-        case 1: return weapon_names[_index];
-        case 2: return armor_names[_index];
-        case 3: return key_names[_index];
-        case 4: return light_names[_index];
+        case 0: return ig_item_names[_index];
+        case 1: return ig_weapon_names[_index];
+        case 2: return ig_armor_names[_index];
+        case 3: return ig_key_names[_index];
+        case 4: return ig_light_names[_index];
     }
     return """";
 };
 
-update_preview = function()
+ig_update_preview = function()
 {
-    var _count = get_count();
-    preview_id = -1;
-    preview_name = """";
-    preview_desc = """";
-    preview_extra = """";
+    var _count = ig_get_count();
+    ig_preview_id = -1;
+    ig_preview_name = """";
+    ig_preview_desc = """";
+    ig_preview_extra = """";
     if (_count <= 0)
         return;
 
-    selected = clamp(selected, 0, _count - 1);
-    preview_id = get_id(selected);
-    preview_name = get_name(selected);
+    ig_selected = clamp(ig_selected, 0, _count - 1);
+    ig_preview_id = ig_get_id(ig_selected);
+    ig_preview_name = ig_get_name(ig_selected);
 
-    switch (category)
+    switch (ig_category)
     {
         case 0:
             itemdescb = """";
-            scr_iteminfo(preview_id);
-            preview_desc = string(itemdescb);
+            scr_iteminfo(ig_preview_id);
+            ig_preview_desc = string(itemdescb);
             break;
         case 1:
             weapondesctemp = """";
-            scr_weaponinfo(preview_id);
-            preview_desc = string(weapondesctemp);
-            preview_extra = ""AT "" + string(weaponattemp) + ""   DF "" + string(weapondftemp) + ""   MAG "" + string(weaponmagtemp);
+            scr_weaponinfo(ig_preview_id);
+            ig_preview_desc = string(weapondesctemp);
+            ig_preview_extra = ""AT "" + string(weaponattemp) + ""   DF "" + string(weapondftemp) + ""   MAG "" + string(weaponmagtemp);
             if (string_length(string_replace_all(string(weaponabilitytemp), "" "", """")) > 0)
-                preview_extra += ""   "" + string(weaponabilitytemp);
+                ig_preview_extra += ""   "" + string(weaponabilitytemp);
             break;
         case 2:
             armordesctemp = """";
-            scr_armorinfo(preview_id);
-            preview_desc = string(armordesctemp);
-            preview_extra = ""AT "" + string(armorattemp) + ""   DF "" + string(armordftemp) + ""   MAG "" + string(armormagtemp);
+            scr_armorinfo(ig_preview_id);
+            ig_preview_desc = string(armordesctemp);
+            ig_preview_extra = ""AT "" + string(armorattemp) + ""   DF "" + string(armordftemp) + ""   MAG "" + string(armormagtemp);
             if (string_length(string_replace_all(string(armorabilitytemp), "" "", """")) > 0)
-                preview_extra += ""   "" + string(armorabilitytemp);
+                ig_preview_extra += ""   "" + string(armorabilitytemp);
             break;
         case 3:
             tempkeyitemdesc = """";
-            scr_keyiteminfo(preview_id);
-            preview_desc = string(tempkeyitemdesc);
+            scr_keyiteminfo(ig_preview_id);
+            ig_preview_desc = string(tempkeyitemdesc);
             break;
         case 4:
-            preview_desc = ""Light World inventory item."";
+            ig_preview_desc = ""Light World inventory item."";
             break;
     }
 };
 
-build_lists = function()
+ig_build_lists = function()
 {
-    item_ids = [];
-    item_names = [];
-    weapon_ids = [];
-    weapon_names = [];
-    armor_ids = [];
-    armor_names = [];
-    key_ids = [];
-    key_names = [];
-    light_ids = [];
-    light_names = [];
+    ig_item_ids = [];
+    ig_item_names = [];
+    ig_weapon_ids = [];
+    ig_weapon_names = [];
+    ig_armor_ids = [];
+    ig_armor_names = [];
+    ig_key_ids = [];
+    ig_key_names = [];
+    ig_light_ids = [];
+    ig_light_names = [];
 
     for (var _id = 1; _id <= 255; _id++)
     {
@@ -173,8 +175,8 @@ build_lists = function()
         var _clean = string_replace_all(string_replace_all(_name, "" "", """"), ""#"", """");
         if (string_length(_clean) > 0)
         {
-            array_push(item_ids, _id);
-            array_push(item_names, _name);
+            array_push(ig_item_ids, _id);
+            array_push(ig_item_names, _name);
         }
 
         weaponnametemp = "" "";
@@ -183,8 +185,8 @@ build_lists = function()
         _clean = string_replace_all(string_replace_all(_name, "" "", """"), ""#"", """");
         if (string_length(_clean) > 0)
         {
-            array_push(weapon_ids, _id);
-            array_push(weapon_names, _name);
+            array_push(ig_weapon_ids, _id);
+            array_push(ig_weapon_names, _name);
         }
 
         armornametemp = "" "";
@@ -193,8 +195,8 @@ build_lists = function()
         _clean = string_replace_all(string_replace_all(_name, "" "", """"), ""#"", """");
         if (string_length(_clean) > 0)
         {
-            array_push(armor_ids, _id);
-            array_push(armor_names, _name);
+            array_push(ig_armor_ids, _id);
+            array_push(ig_armor_names, _name);
         }
 
         tempkeyitemname = "" "";
@@ -203,8 +205,8 @@ build_lists = function()
         _clean = string_replace_all(string_replace_all(_name, "" "", """"), ""#"", """");
         if (string_length(_clean) > 0)
         {
-            array_push(key_ids, _id);
-            array_push(key_names, _name);
+            array_push(ig_key_ids, _id);
+            array_push(ig_key_names, _name);
         }
     }
 
@@ -218,158 +220,173 @@ build_lists = function()
         var _clean = string_replace_all(string_replace_all(_name, "" "", """"), ""#"", """");
         if (string_length(_clean) > 0)
         {
-            array_push(light_ids, _id);
-            array_push(light_names, _name);
+            array_push(ig_light_ids, _id);
+            array_push(ig_light_names, _name);
         }
     }
     global.litem[7] = _old_light_item;
     scr_litemname();
 
-    lists_built = true;
-    selected = 0;
-    update_preview();
+    ig_lists_built = true;
+    ig_selected = 0;
+    ig_update_preview();
 };
 
-close_menu = function()
+ig_close_menu = function()
 {
-    menu_open = false;
-    global.interact = saved_interact;
+    ig_menu_open = false;
+    if (variable_global_exists(""interact""))
+        global.interact = ig_saved_interact;
 };
 ");
 
-importGroup.QueueReplace(objItemGiver.EventHandlerFor(EventType.Step, (uint)0, Data),
-@"if (status_timer > 0)
-    status_timer--;
+importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Step, (uint)0, Data),
+@"if (ig_status_timer > 0)
+    ig_status_timer--;
 
-if (!menu_open)
+if (!ig_menu_open)
 {
-    if (keyboard_check_pressed(vk_f8))
+    if (keyboard_check_pressed(vk_f7))
     {
         if (instance_exists(obj_battlecontroller))
         {
-            status_text = ""Item Giver is unavailable during battle."";
-            status_ok = false;
-            status_timer = 120;
-            exit;
+            ig_status_text = ""Item Giver is unavailable during battle."";
+            ig_status_ok = false;
+            ig_status_timer = 120;
         }
+        else if (!variable_global_exists(""item""))
+        {
+            ig_status_text = ""Load a save before opening Item Giver."";
+            ig_status_ok = false;
+            ig_status_timer = 120;
+        }
+        else
+        {
+            if (!ig_lists_built)
+                ig_build_lists();
 
-        if (!lists_built)
-            build_lists();
-
-        saved_interact = global.interact;
-        global.interact = 1;
-        menu_open = true;
-        update_preview();
-    }
-    exit;
-}
-
-if (instance_exists(obj_battlecontroller))
-{
-    close_menu();
-    exit;
-}
-
-global.interact = 1;
-
-if (keyboard_check_pressed(vk_f8) || keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord(""X"")))
-{
-    close_menu();
-    exit;
-}
-
-var _changed = false;
-if (keyboard_check_pressed(vk_left))
-{
-    category = (category + 4) mod 5;
-    selected = 0;
-    _changed = true;
-}
-if (keyboard_check_pressed(vk_right))
-{
-    category = (category + 1) mod 5;
-    selected = 0;
-    _changed = true;
-}
-
-var _count = get_count();
-if (_count > 0)
-{
-    if (keyboard_check_pressed(vk_up))
-    {
-        selected = (selected + _count - 1) mod _count;
-        _changed = true;
-    }
-    if (keyboard_check_pressed(vk_down))
-    {
-        selected = (selected + 1) mod _count;
-        _changed = true;
-    }
-    if (keyboard_check_pressed(vk_pageup))
-    {
-        selected = max(0, selected - 10);
-        _changed = true;
-    }
-    if (keyboard_check_pressed(vk_pagedown))
-    {
-        selected = min(_count - 1, selected + 10);
-        _changed = true;
-    }
-    if (keyboard_check_pressed(vk_home))
-    {
-        selected = 0;
-        _changed = true;
-    }
-    if (keyboard_check_pressed(vk_end))
-    {
-        selected = _count - 1;
-        _changed = true;
+            if (variable_global_exists(""interact""))
+            {
+                ig_saved_interact = global.interact;
+                global.interact = 1;
+            }
+            ig_menu_open = true;
+            ig_update_preview();
+        }
     }
 }
-
-if (keyboard_check_pressed(ord(""R"")))
+else
 {
-    build_lists();
-    status_text = ""Item tables refreshed."";
-    status_ok = true;
-    status_timer = 120;
-    _changed = true;
-}
-
-if (_changed)
-    update_preview();
-
-if (_count > 0 && (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(ord(""Z""))))
-{
-    var _id = get_id(selected);
-    var _name = get_name(selected);
-    noroom = 0;
-
-    switch (category)
+    if (instance_exists(obj_battlecontroller))
     {
-        case 0: scr_itemget(_id); break;
-        case 1: scr_weaponget(_id); break;
-        case 2: scr_armorget(_id); break;
-        case 3: scr_keyitemget(_id); break;
-        case 4: scr_litemget(_id); break;
-    }
-
-    if (norom == 1)
-    {
-        status_text = ""No inventory space for "" + _name + ""."";
-        status_ok = false;
+        ig_close_menu();
     }
     else
     {
-        status_text = ""Added "" + _name + "" (ID "" + string(_id) + "")."";
-        status_ok = true;
-    }
-    status_timer = 180;
-    update_preview();
-}
-");
+        if (variable_global_exists(""interact""))
+            global.interact = 1;
 
-importGroup.QueueReplace(objItemGiver.EventHandlerFor(EventType.Draw, (uint)64, Data),
+        if (keyboard_check_pressed(vk_f7) || keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord(""X"")))
+        {
+            ig_close_menu();
+        }
+        else
+        {
+            var _changed = false;
+            if (keyboard_check_pressed(vk_left))
+            {
+                ig_category = (ig_category + 4) mod 5;
+                ig_selected = 0;
+                _changed = true;
+            }
+            if (keyboard_check_pressed(vk_right))
+            {
+                ig_category = (ig_category + 1) mod 5;
+                ig_selected = 0;
+                _changed = true;
+            }
+
+            var _count = ig_get_count();
+            if (_count > 0)
+            {
+                if (keyboard_check_pressed(vk_up))
+                {
+                    ig_selected = (ig_selected + _count - 1) mod _count;
+                    _changed = true;
+                }
+                if (keyboard_check_pressed(vk_down))
+                {
+                    ig_selected = (ig_selected + 1) mod _count;
+                    _changed = true;
+                }
+                if (keyboard_check_pressed(vk_pageup))
+                {
+                    ig_selected = max(0, ig_selected - 10);
+                    _changed = true;
+                }
+                if (keyboard_check_pressed(vk_pagedown))
+                {
+                    ig_selected = min(_count - 1, ig_selected + 10);
+                    _changed = true;
+                }
+                if (keyboard_check_pressed(vk_home))
+                {
+                    ig_selected = 0;
+                    _changed = true;
+                }
+                if (keyboard_check_pressed(vk_end))
+                {
+                    ig_selected = _count - 1;
+                    _changed = true;
+                }
+            }
+
+            if (keyboard_check_pressed(ord(""R"")))
+            {
+                ig_build_lists();
+                ig_status_text = ""Item tables refreshed."";
+                ig_status_ok = true;
+                ig_status_timer = 120;
+                _changed = true;
+            }
+
+            if (_changed)
+                ig_update_preview();
+
+            _count = ig_get_count();
+            if (_count > 0 && (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(ord(""Z""))))
+            {
+                var _id = ig_get_id(ig_selected);
+                var _name = ig_get_name(ig_selected);
+                noroom = 0;
+
+                switch (ig_category)
+                {
+                    case 0: scr_itemget(_id); break;
+                    case 1: scr_weaponget(_id); break;
+                    case 2: scr_armorget(_id); break;
+                    case 3: scr_keyitemget(_id); break;
+                    case 4: scr_litemget(_id); break;
+                }
+
+                if (noroom == 1)
+                {
+                    ig_status_text = ""No inventory space for "" + _name + ""."";
+                    ig_status_ok = false;
+                }
+                else
+                {
+                    ig_status_text = ""Added "" + _name + "" (ID "" + string(_id) + "")."";
+                    ig_status_ok = true;
+                }
+                ig_status_timer = 180;
+                ig_update_preview();
+            }
+        }
+    }
+}");
+
+importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Draw, (uint)64, Data),
 @"var _old_font = draw_get_font();
 var _old_color = draw_get_color();
 var _old_alpha = draw_get_alpha();
@@ -380,17 +397,17 @@ draw_set_font(fnt_main);
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 
-if (!menu_open)
+if (!ig_menu_open)
 {
-    if (status_timer > 0)
+    if (ig_status_timer > 0)
     {
         draw_set_alpha(0.88);
         draw_set_color(c_black);
         draw_rectangle(120, 16, 520, 48, false);
         draw_set_alpha(1);
-        draw_set_color(status_ok ? c_lime : c_red);
+        draw_set_color(ig_status_ok ? c_lime : c_red);
         draw_set_halign(fa_center);
-        draw_text(320, 23, status_text);
+        draw_text(320, 23, ig_status_text);
     }
 
     draw_set_halign(_old_halign);
@@ -412,18 +429,18 @@ draw_set_halign(fa_center);
 draw_set_color(c_fuchsia);
 draw_text(320, 31, ""ITEM GIVER"");
 draw_set_color(c_white);
-draw_text(320, 53, ""< "" + category_names[category] + "" >"");
+draw_text(320, 53, ""<  "" + ig_category_names[ig_category] + ""  >"");
 
-var _count = get_count();
+var _count = ig_get_count();
 draw_set_halign(fa_left);
 draw_set_color(c_gray);
 draw_text(37, 73, ""ID"");
 draw_text(78, 73, ""NAME"");
 draw_set_halign(fa_right);
-draw_text(603, 73, string(selected + 1) + "" / "" + string(_count));
+draw_text(603, 73, string(ig_selected + 1) + "" / "" + string(_count));
 
 var _visible = 10;
-var _start = clamp(selected - 4, 0, max(0, _count - _visible));
+var _start = clamp(ig_selected - 4, 0, max(0, _count - _visible));
 for (var _row = 0; _row < _visible; _row++)
 {
     var _index = _start + _row;
@@ -431,9 +448,9 @@ for (var _row = 0; _row < _visible; _row++)
         break;
 
     var _y = 94 + (_row * 22);
-    var _id = get_id(_index);
-    var _name = get_name(_index);
-    if (_index == selected)
+    var _id = ig_get_id(_index);
+    var _name = ig_get_name(_index);
+    if (_index == ig_selected)
     {
         draw_set_alpha(0.25);
         draw_set_color(c_fuchsia);
@@ -454,24 +471,24 @@ for (var _row = 0; _row < _visible; _row++)
 draw_set_color(c_gray);
 draw_line(31, 318, 609, 318);
 draw_set_color(c_yellow);
-draw_text(37, 327, preview_name + ""  [ID "" + string(preview_id) + ""]"");
+draw_text(37, 327, ig_preview_name + ""  [ID "" + string(ig_preview_id) + ""]"");
 draw_set_color(c_white);
-draw_text(37, 350, string_hash_to_newline(preview_desc));
-if (string_length(preview_extra) > 0)
+draw_text(37, 350, string_hash_to_newline(ig_preview_desc));
+if (string_length(ig_preview_extra) > 0)
 {
     draw_set_color(c_aqua);
-    draw_text(37, 395, preview_extra);
+    draw_text(37, 395, ig_preview_extra);
 }
 
-if (status_timer > 0)
+if (ig_status_timer > 0)
 {
-    draw_set_color(status_ok ? c_lime : c_red);
-    draw_text(37, 417, status_text);
+    draw_set_color(ig_status_ok ? c_lime : c_red);
+    draw_text(37, 417, ig_status_text);
 }
 
 draw_set_color(c_gray);
 draw_set_halign(fa_center);
-draw_text(320, 440, ""Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F8: Close"");
+draw_text(320, 440, ""Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F7: Close"");
 
 draw_set_halign(_old_halign);
 draw_set_valign(_old_valign);
@@ -480,17 +497,10 @@ draw_set_color(_old_color);
 draw_set_alpha(_old_alpha);
 ");
 
-importGroup.QueueReplace(objItemGiver.EventHandlerFor(EventType.CleanUp, (uint)0, Data),
-@"if (menu_open)
-    global.interact = saved_interact;
-");
-
-importGroup.QueueAppend("gml_GlobalScript_scr_gamestart",
-@"if (!instance_exists(obj_item_giver))
-{
-    instance_create(0, 0, obj_item_giver);
-}
+importGroup.QueueAppend(objTime.EventHandlerFor(EventType.CleanUp, (uint)0, Data),
+@"if (ig_menu_open && variable_global_exists(""interact""))
+    global.interact = ig_saved_interact;
 ");
 
 importGroup.Import();
-ScriptMessage("Item Giver installed for Chapter 1. Press F8 outside battle.");
+ScriptMessage("Item Giver v0.1.3 installed for Chapter 1. Press F7 outside battle.");

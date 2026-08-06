@@ -1,18 +1,23 @@
 # Item Giver Mode
 
-**Version:** 0.1.2  
+**Version:** 0.1.3  
 **Target:** DELTARUNE Windows full release, launcher version `v23`  
 **Chapters:** 1–5  
-**Installer:** Deltamod-compatible UTMT `.csx` patches
+**Installer:** Deltamod-compatible UndertaleModTool `.csx` patches
 
-Item Giver Mode adds a standalone debug-style inventory browser. Press **F7** outside battle to browse and grant every named item definition available in the current chapter.
+Item Giver Mode adds a debug-style inventory browser. Load a save and press **F7** outside battle to browse and grant every named item definition available in the current chapter.
 
-## Version 0.1.2
+## Version 0.1.3
 
-- Fixed the startup crash `global variable name '__objectID2Depth' ... not set before reading it`.
-- The crash came from DELTARUNE's `instance_create` wrapper calling `object_get_depth` for the newly added `obj_item_giver`, whose dynamic object ID is not present in the game's startup depth table.
-- Startup now uses `instance_create_depth(0, 0, -999999, obj_item_giver)` so no internal object-depth lookup is required.
-- F7 remains the open/close hotkey.
+This release replaces the custom runtime `obj_item_giver` architecture used by v0.1.0–v0.1.2.
+
+- F7 input now runs from DELTARUNE's native persistent `obj_time` controller.
+- The Item Giver interface is attached to `obj_time`'s Draw GUI event.
+- No custom Item Giver instance is created at runtime.
+- This avoids both the `__objectID2Depth` startup crash and cases where the custom object's input event failed to open the menu.
+- Item Giver instance fields and helper functions are prefixed with `ig_` to reduce collisions with the base game and other mods.
+- Keeps F7 as the hotkey to avoid Medal's F8 clipping shortcut.
+- Keeps the corrected `noroom` inventory-full check.
 
 ## Categories
 
@@ -22,7 +27,7 @@ Item Giver Mode adds a standalone debug-style inventory browser. Press **F7** ou
 - Key Items
 - Light World items
 
-The lists are generated from the game’s own item-information scripts at runtime. The scanner checks IDs `1–255`, ignores blank definitions, and therefore also detects named items added by compatible mods.
+The lists are generated from the game's own item-information scripts at runtime. IDs `1–255` are scanned and blank definitions are ignored, so named items added by compatible mods can also appear.
 
 ## Controls
 
@@ -37,46 +42,39 @@ The lists are generated from the game’s own item-information scripts at runtim
 | R | Refresh item definitions |
 | X / Escape | Close |
 
-The menu cannot be opened during battle. While open in the overworld, it temporarily blocks normal interaction and restores the previous interaction state when closed.
+The menu intentionally refuses to open while `obj_battlecontroller` exists. Press F7 after loading a save and while in normal overworld control.
 
 ## Inventory behavior
 
-Item Giver Mode calls DELTARUNE’s native grant functions:
+Item Giver Mode uses DELTARUNE's native grant functions:
 
-- Consumables use `scr_itemget`; where supported, a full normal inventory can spill into pocket storage.
-- Weapons use `scr_weaponget`.
-- Armor uses `scr_armorget`.
-- Key items use `scr_keyitemget`.
-- Light World items use `scr_litemget`.
+- Consumables: `scr_itemget`
+- Weapons: `scr_weaponget`
+- Armor: `scr_armorget`
+- Key items: `scr_keyitemget`
+- Light World items: `scr_litemget`
 
-The menu reports when the destination inventory is full. It does not automatically remove existing entries or silently overwrite equipped equipment.
+The menu reports when the destination inventory is full. It does not silently overwrite equipped equipment.
 
 ## Save warning
 
-This is a debug utility. Some key items, unused items, and developer-facing definitions depend on plot flags or scripted acquisition sequences. Spawning an item does **not** automatically set every flag normally associated with earning it. Back up the save before experimenting with progression-sensitive entries.
+This is a debug utility. Some key items, unused items, and developer-facing definitions depend on plot flags or scripted acquisition sequences. Giving an item does **not** automatically set every flag normally associated with earning it. Back up the save before experimenting with progression-sensitive entries.
 
 ## Installation
 
-Install `Item_Giver_Mode_v0.1.2_Deltamod.zip` directly through Deltamod. Do not extract it into the game manually.
+Install `Item_Giver_Mode_v0.1.3_Deltamod.zip` through Deltamod. Do not manually overwrite `data.win`.
 
-The GitHub project mirrors the package source under [`release/`](release/). Run `build_release.py` inside that folder, then ZIP the folder contents so `meta.json` and `modding.xml` are at the archive root.
+The package ID remains `github.itemgivermode.gladiatorgaming`.
 
-The package ID remains `github.itemgivermode.gladiatorgaming`, so v0.1.2 updates earlier versions in place.
+Release SHA-256: `31bb9893ba38a7b54953487953e3bc7155d52860a7eb77729a9ba73f29a865e5`
 
-Release SHA-256: `c6480fa7a84cccc8c6cf73b0b41be291b3845bdabe08a5550bb0f026cda7cab8`
+## Compatibility and validation
 
-## Compatibility
+- All five chapter patches compile against the supplied clean v23 chapter files.
+- Applying v0.1.3 twice produces byte-identical output in Chapters 1–5.
+- Round-trip decompilation confirms F7 handling is present in native `gml_Object_obj_time_Step_0` and the GUI is present in `gml_Object_obj_time_Draw_64`.
+- Debug Mode v4.01 compiles successfully before and after Item Giver Mode in Chapters 1–5; both F10 and F7 handlers survive in `obj_time`.
+- Secret Boss Challenge v0.4.0 compiles successfully before and after Item Giver Mode in Chapter 5.
+- Scripts extracted from the final Deltamod ZIP reproduce the tested outputs byte-for-byte.
 
-- All five chapter patches are declared as `type="csx"` for Deltamod’s UndertaleModCli stage.
-- F7 does not overlap Debug Mode v4.01's current function-key shortcuts.
-- The startup change is isolated to Item Giver's guarded `scr_gamestart` append.
-- Secret Boss Challenge compatibility behavior is unchanged from v0.1.1.
-- Applying Item Giver Mode v0.1.2 twice produced byte-identical chapter files in Chapters 1–5.
-
-Mods that replace `scr_gamestart` outright or define another object named `obj_item_giver` may require a dedicated compatibility build.
-
-## Source and validation
-
-The tested release ZIP and mirrored `release/` folder contain the distributable CSX source. No original DELTARUNE executable, `data.win`, music, or complete decompiled game source is included.
-
-See [`tests/TEST_REPORT.md`](tests/TEST_REPORT.md) for validation details.
+See [`tests/TEST_REPORT.md`](tests/TEST_REPORT.md) for details.

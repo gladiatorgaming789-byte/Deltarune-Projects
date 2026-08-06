@@ -1,19 +1,28 @@
-# Item Giver Mode v0.1.2 — Test Report
+# Item Giver Mode v0.1.3 — Test Report
 
-## Bug fixed
+## Reported issue
 
-The user reported an immediate startup crash in `gml_GlobalScript_scr_gamestart`:
+After the v0.1.2 startup crash was fixed, pressing F7 still did not open the Item Giver menu in the user's game.
 
-`global variable name '__objectID2Depth' ... not set before reading it`
+## Root-cause mitigation
 
-The call chain was `scr_gamestart -> instance_create -> object_get_depth`. Item Giver adds `obj_item_giver` dynamically through UTMT, but DELTARUNE's internal object-ID-to-depth table is initialized for the original object set and does not contain that new object ID.
+Versions 0.1.0–0.1.2 depended on a dynamically added persistent `obj_item_giver` instance to receive Step and Draw GUI events. v0.1.3 removes that runtime dependency completely.
 
-v0.1.2 changes the guarded startup creation from `instance_create(0, 0, obj_item_giver)` to `instance_create_depth(0, 0, -999999, obj_item_giver)`. This bypasses `object_get_depth` and the missing `__objectID2Depth` lookup entirely.
+The Item Giver now patches DELTARUNE's native persistent `obj_time` object:
+
+- Create event: initializes Item Giver state and helper functions.
+- Step event: handles F7, navigation, refresh, and grant input.
+- Draw GUI event: renders the Item Giver overlay and status messages.
+- Clean Up event: restores interaction state if needed.
+
+No `obj_item_giver` instance is created by v0.1.3.
 
 ## Environment
 
 - UndertaleModTool CLI 0.9.1.2 for Ubuntu
 - Deltamod-compatible CSX package structure
+- Debug Mode v4.01
+- Secret Boss Challenge v0.4.0
 - Supplied DELTARUNE Windows full-release files, launcher version `v23`
 
 ## Clean source checksums
@@ -24,31 +33,65 @@ v0.1.2 changes the guarded startup creation from `instance_create(0, 0, obj_item
 - Chapter 4: `ed64789586238b52375e994e1c1cf13694dd2d0dab57d13e639b9c892e37d8f2`
 - Chapter 5: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
-## Compilation and idempotency
+## Clean compilation
 
-The v0.1.2 CSX scripts compiled and wrote successfully against all five clean chapter files. Each matching script was then applied a second time; the second output was byte-identical to the first output in every chapter.
+v0.1.3 compiled successfully against all five clean chapters.
 
 Rebuilt SHA-256 values:
 
-- Chapter 1: `a3df0cd31dd74cc5d0f93b1dec01bae1ef3dcfb517c97b098138203c5e6a2f53`
-- Chapter 2: `e72cee5ebbf9c0a5c45b12d6d748ad2cff71edd3b3c0b6e9cce84fc0ce0e5f6f`
-- Chapter 3: `db2930c2be26ae7277771dabb234117d93d0c815cfff5fbe015c1368f9d27347`
-- Chapter 4: `3186c0ed0787f6a0e64ddeb7d4dc7666bd0a06e798dfde5eb5dced01331831bd`
-- Chapter 5: `58a71aa5d9c3e38682867bd25a627d2f6c0758fbe831798955eea846866d2f3b`
+- Chapter 1: `d4df0619bd2a4a21d9b7d8e8f8eeaa42ed35bf82ba0fa4337a4e52b41694774c`
+- Chapter 2: `46e658654656cc1b292492999be33768d9e89ff9b1010956601e4dcab51354ea`
+- Chapter 3: `9ceaaef56ca884aea38e1df2e481ff8b16e00d466ff63522a133db6c9e093461`
+- Chapter 4: `6af064d20508762bf94362f8c7324013695fcc7ff7ba204c5bc2128b56a0b01e`
+- Chapter 5: `37c0920f80bc6869ea8a5f362b43696d9cd3400432eb29d9b0cd50589e42b86a`
 
-All five packaged CSX files contain `instance_create_depth(0, 0, -999999, obj_item_giver)` and contain no remaining `instance_create(0, 0, obj_item_giver)` startup call.
+## Round-trip verification
+
+Chapter 1 was reopened and the patched native events were decompiled.
+
+Confirmed:
+
+- `gml_Object_obj_time_Create_0` contains `ig_itemgiver_version = "0.1.3"` and `ig_build_lists`.
+- `gml_Object_obj_time_Step_0` contains the F7 open/close handler.
+- `gml_Object_obj_time_Draw_64` contains the `ITEM GIVER` GUI.
+- The runtime input path no longer depends on `obj_item_giver` or `instance_create`.
+
+## Idempotency
+
+Applying v0.1.3 a second time to every rebuilt chapter produced byte-identical output in Chapters 1–5.
+
+## Debug Mode v4.01 compatibility
+
+Both patch orders compiled successfully for Chapters 1–5:
+
+1. Clean → Debug Mode → Item Giver v0.1.3
+2. Clean → Item Giver v0.1.3 → Debug Mode
+
+Chapter 1 round-trip checks confirmed both outputs retain:
+
+- Debug Mode's `vk_f10` handler
+- Item Giver's `vk_f7` handler
+- Item Giver's Draw GUI event
+
+## Secret Boss Challenge v0.4.0 compatibility
+
+Both Chapter 5 patch orders compiled successfully:
+
+1. Clean → Secret Boss Challenge → Item Giver v0.1.3
+2. Clean → Item Giver v0.1.3 → Secret Boss Challenge
 
 ## Package validation
 
-- `meta.json` parses as valid JSON.
-- Version is `0.1.2`.
+- `meta.json` parses successfully and reports version `0.1.3`.
 - Package ID remains `github.itemgivermode.gladiatorgaming`.
-- `neededFiles` contains the five verified clean chapter hashes.
-- `modding.xml` contains five `type="csx"` routes.
-- Required files are at the archive root.
-- ZIP compressed-data integrity test passed.
-- ZIP SHA-256: `c6480fa7a84cccc8c6cf73b0b41be291b3845bdabe08a5550bb0f026cda7cab8`.
+- `modding.xml` contains five Deltamod CSX patch fragments.
+- Every referenced chapter patch exists in the archive.
+- ZIP integrity check passed.
+- Scripts extracted from the final ZIP are byte-identical to the tested source scripts.
+- Applying those extracted scripts reproduces the tested chapter outputs byte-for-byte.
+- ZIP size: `20215` bytes.
+- ZIP SHA-256: `31bb9893ba38a7b54953487953e3bc7155d52860a7eb77729a9ba73f29a865e5`.
 
-## Remaining manual check
+## Not completed
 
-The exact user-reported crash path has been removed and the replacement compiles in all five chapters. A fresh in-game startup/menu-opening test still needs to be confirmed by running the release in the user's normal Deltamod/Windows setup.
+A full interactive in-game keypress test was not automated in the headless workspace. The important change in v0.1.3 is that F7 is now evaluated by DELTARUNE's existing persistent `obj_time` Step event rather than a dynamically added runtime object. The user should replace v0.1.2 with v0.1.3 and test F7 after loading a save in the overworld.

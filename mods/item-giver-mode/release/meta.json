@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Item Giver Mode",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "color": {
       "r": 80,
       "g": 220,
       "b": 255
     },
-    "description": "Adds an F7 item browser that can grant any named item, weapon, armor, key item, or Light World item defined by Chapters 1-5.",
+    "description": "Adds an F7 item browser using DELTARUNE's native persistent controller to grant named items, weapons, armor, key items, or Light World items in Chapters 1-5.",
     "author": [
       "GladiatorGaming"
     ],
