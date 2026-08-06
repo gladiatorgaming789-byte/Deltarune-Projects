@@ -17,9 +17,10 @@ Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
 Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 
-- Latest tested release: `Item_Giver_Mode_v0.1.1_Deltamod.zip`; reproducible package source is mirrored in [`release/`](item-giver-mode/release/).
+- Latest tested release: `Item_Giver_Mode_v0.1.2_Deltamod.zip`; reproducible package source is mirrored in [`release/`](item-giver-mode/release/).
 - Adds an F7 debug-style item browser to Chapters 1–5.
 - Supports consumable items, weapons, armor, key items, and Light World items.
+- Fixes the startup `__objectID2Depth` crash by using explicit-depth object creation.
 - Reads the final item tables at runtime, allowing named items from compatible mods to appear.
 - Includes source CSX patches, metadata, license, and a validation report.
 
