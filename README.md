@@ -21,9 +21,9 @@ All completed work is organized by project type. Installable builds must remain 
   - Source/project documentation
   - License and tests
 - [Item Giver Mode](mods/item-giver-mode/README.md)
-  - Current version: **0.1.0**
-  - [Deltamod package contents](mods/item-giver-mode/release/)
-  - F8 item browser for Chapters 1–5
+  - Current version: **0.1.1**
+  - [Deltamod package source](mods/item-giver-mode/release/)
+  - F7 item browser for Chapters 1–5
   - Items, weapons, armor, key items, and Light World items
   - Source CSX patches and validation report
 
