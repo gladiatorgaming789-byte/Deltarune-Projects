@@ -24,9 +24,9 @@
 
 - Added as Chapter 5 weapon ID `38`, an unused weapon slot in the tested build.
 - Name: `Pink's Staff`
-- Character: Ralsei
+- Character: Kris only
 - Stats: 8 AT, 4 DF, 12 MAG
-- Name, description, character reactions, icon, value, and equip restriction are defined through `scr_weaponinfo`.
+- Name, description, character reactions, standard Kris weapon icon, value, and Kris-only equip restriction are defined through `scr_weaponinfo`.
 - Weapon inventory and equipped-item checks prevent duplicate grants.
 
 ### Pink reward
@@ -52,7 +52,7 @@
 2. UndertaleModTool compiled and wrote the rebuilt file successfully.
 3. Reopened the rebuilt file and dumped every changed code entry.
 4. Confirmed the decompiled output contains:
-   - Pink's Staff definition and stats
+   - Pink's Staff definition, stats, Kris-only equip flag, and weapon icon
    - one-time staff and coin flags
    - full-inventory recovery path
    - four-choice shop dialogue
@@ -64,15 +64,15 @@
 
 Both Chapter 5 patch orders compiled successfully:
 
-1. Clean Chapter 5 → Debug Mode v4.01 → Secret Boss Challenge v0.2.0
-2. Clean Chapter 5 → Secret Boss Challenge v0.2.0 → Debug Mode v4.01
+1. Clean Chapter 5 → Debug Mode v4.01 → Secret Boss Challenge v0.2.1
+2. Clean Chapter 5 → Secret Boss Challenge v0.2.1 → Debug Mode v4.01
 
-Round-trip decompilation of both outputs confirmed that Pink's Staff, the one-time reward flags, reward messages, and expanded flower-shop thresholds remained present.
+Round-trip decompilation of both outputs confirmed that Pink's Staff remained Kris-only, along with the one-time reward flags, reward messages, and expanded flower-shop thresholds.
 
 ## Deltamod package validation
 
 - `meta.json` parses as valid JSON.
-- Nested `metadata.version` is `0.2.0`.
+- Nested `metadata.version` is `0.2.1`.
 - The package ID remains `github.secretbosschallenge.gladiatorgaming` for in-place updates.
 - `neededFiles` contains the verified Chapter 1, Chapter 2, and Chapter 5 checksums.
 - `modding.xml` contains three `type="csx"` entries.
