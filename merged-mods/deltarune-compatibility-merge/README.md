@@ -2,6 +2,23 @@
 
 Deltamod-compatible compatibility merge targeting the supplied Windows launcher and Chapters 1–5.
 
+## Current release
+
+**Version 1.0.1 — Better Saves runtime hotfix**
+
+SHA-256: `15cbc10c5d80d637799ce646447ed2a355b41ce7d4360394f473fa39e416f4f8`
+
+### Hotfix changes
+
+- Restored the four Better Saves icon sprites in the launcher and Chapters 1–5:
+  - `spr_bettersaves_star`
+  - `spr_bettersaves_crystal`
+  - `spr_bettersaves_sideb`
+  - `spr_bettersaves_star_sideb`
+- Fixed the `DEVICE_MENU` Draw crash caused by those missing sprite resources.
+- Restored the complete Better Saves Chapter 1 menu renderer. The previous merge had accidentally retained a large vanilla draw block while resolving 60 FPS timing edits.
+- Fixed `Trying to write to undefined INI file` during save scanning. Custom Difficulty's `scr_gamestart()` temporarily switches to `difficulty.ini`; Better Saves now restores its active `dr.ini` before later metadata reads and writes.
+
 ## Fully merged
 
 - Custom Difficulty 1.8.3 — Emmahaha
@@ -14,7 +31,7 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 ## Improved Pink Fight Background
 
-The `pink.ogg` override is included. The visual `data.win` patch is not included because both the uploaded archive and the currently published Deltamod archive require Chapter 5 SHA-256 `7e3e9c4a0ef84f0129b6a1c9e9f81091e83abbafbf66eb09893c2082cf5618de`, while the supplied Chapter 5 file is `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`. Forced application produced invalid pointer-bearing GameMaker resources, so it was excluded rather than shipping corruption.
+The `pink.ogg` override is included. The visual `data.win` patch is not included because the published patch requires Chapter 5 SHA-256 `7e3e9c4a0ef84f0129b6a1c9e9f81091e83abbafbf66eb09893c2082cf5618de`, while the supplied Chapter 5 file is `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`. Forced application produced invalid pointer-bearing GameMaker resources, so it was excluded rather than shipping corruption.
 
 ## Compatibility decisions
 
@@ -26,9 +43,9 @@ The `pink.ogg` override is included. The visual `data.win` patch is not included
 
 ## Validation
 
-- Launcher and Chapters 1–5 reopen and decompile with UndertaleModTool CLI.
-- Every final xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
+- Launcher and Chapters 1–5 were freshly reopened with UndertaleModTool CLI.
+- All four Better Saves icon sprites were confirmed present in every target.
+- Every v1.0.1 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended repaired file.
 - The packaged ZIP was extracted and all six patches were tested again from the packaged copies.
-- Final package SHA-256: `277f2e94f1ad72acd1d9c462d8225863b45b2d472536fec173407e89e700bafd`
 
-Full Windows gameplay testing is still recommended, especially save-slot operations, difficulty selection, Knight ACTs, and timing-sensitive attacks.
+Windows runtime testing remains recommended, especially empty-save scanning, menu drawing, save copying/deletion, difficulty selection, Knight ACTs, and timing-sensitive attacks.
