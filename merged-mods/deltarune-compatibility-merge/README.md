@@ -4,23 +4,20 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 ## Current release
 
-**Version 1.0.4 — Chapter 1 smart-target damage hotfix**
+**Version 1.0.6 — Chapter 1 neo-choice cursor hotfix**
 
-SHA-256: `59d47e5fd86a0ea1bac1c32aa5c2176e98baf2a3def371a75375822f7a803f95`
+SHA-256: `2d6f5e7ecddae052c32df352838a31f5a5437b4be2638e86f0470c0060bdaaa5`
 
 ### Hotfix changes
 
-- Fixed the Chapter 1 bullet-contact crash in `scr_damage`:
-  - `Variable Index [4] out of range [3] - charinstance`
-- Chapter 1 Modernized uses target value `4` as a smart/random-target marker. The original merge retained the newer `scr_randomtarget` behavior but omitted the corresponding `target == 4` conversion block, so bullets attempted to access `global.charinstance[4]` directly.
-- Restored the complete smart-target flow:
-  - choose a valid party member before reading `global.charinstance[target]`;
-  - preserve Modernized damage calculation and elemental damage reduction;
-  - preserve Custom Difficulty damage multipliers, down-state deficit, and iframe scaling;
-  - preserve Better Saves debug invulnerability support;
-  - restore the bullet's original target marker after damage processing.
-- Chapters 2–5 were checked and already contained their correct target-4 remapping, so their binaries remain unchanged.
-- Preserves the Better Saves and added-resource fixes from versions 1.0.1–1.0.3.
+- Fixed the soul/cursor alignment on Chapter 1 Modernized's `Prison B1 / Floor 1F` elevator choice.
+- The previous v1.0.5 change targeted the unrelated Chapter 3 board-writer renderer, which is why it had no visible effect.
+- The actual Chapter 1 labels begin with a legacy space plus `#` blank-line marker.
+- Modernized attempted to remove a leading `#` using string index `0`, but GameMaker's first character is index `1`, and the preceding space was not handled.
+- The neo-choice initializer now strips leading formatting spaces and the first leading `#` before calculating line count and cursor position.
+- The ineffective Chapters 3–5 cursor edits from v1.0.5 are not included.
+- Replaced the Pink Fight music override with the newly supplied `pink.ogg`.
+- Preserves the Better Saves, asset-link, Custom Difficulty menu, and Chapter 1 smart-target damage fixes from earlier releases.
 
 ## Fully merged
 
@@ -34,21 +31,11 @@ SHA-256: `59d47e5fd86a0ea1bac1c32aa5c2176e98baf2a3def371a75375822f7a803f95`
 
 ## Improved Pink Fight Background
 
-The `pink.ogg` override is included. The visual `data.win` patch is not included because the published patch requires Chapter 5 SHA-256 `7e3e9c4a0ef84f0129b6a1c9e9f81091e83abbafbf66eb09893c2082cf5618de`, while the supplied Chapter 5 file is `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`. Forced application produced invalid pointer-bearing GameMaker resources, so it was excluded rather than shipping corruption.
-
-## Compatibility decisions
-
-- Better Saves remains authoritative for extra save slots.
-- Custom Difficulty `difficulty.ini` sections follow Better Saves copy, delete, and slot-shift operations.
-- Difficulty-adjusted timers are composed with 60 FPS scaling.
-- Chapter 1 Modernized visuals and sounds are imported while No-Hat Ralsei wins its overlapping face sprite.
-- Knight ACT additions are merged with Chapter 3 difficulty and timing code.
+The newly supplied `pink.ogg` override is included. The visual `data.win` patch is not included because the published patch requires Chapter 5 SHA-256 `7e3e9c4a0ef84f0129b6a1c9e9f81091e83abbafbf66eb09893c2082cf5618de`, while the supplied Chapter 5 file is `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`. Forced application produced invalid pointer-bearing GameMaker resources, so it was excluded rather than shipping corruption.
 
 ## Validation
 
-- The repaired Chapter 1 file was freshly reopened with UndertaleModTool CLI.
-- `scr_damage` was decompiled from the saved output and confirmed to contain `target == 4` remapping, `__remtarget` restoration, Custom Difficulty damage/iframe logic, and Modernized element reduction.
-- Every version 1.0.4 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
+- The repaired Chapter 1 file reopened successfully with UndertaleModTool CLI.
+- The saved code decompiles with first-character index `1` and handles both leading spaces and the `#` marker.
+- Every v1.0.6 xdelta patch was decoded against its clean source and compared byte-for-byte with the intended merged file.
 - The packaged ZIP was extracted, every internal hash was checked, and all six patches were tested again from the packaged copies.
-
-Windows runtime testing remains recommended, especially bullet damage in Chapter 1, save-slot operations, difficulty selection, Knight ACTs, and timing-sensitive attacks.
