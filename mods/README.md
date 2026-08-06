@@ -17,10 +17,10 @@ Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
 Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 
-- Latest tested release: `Item_Giver_Mode_v0.1.3_Deltamod.zip`; reproducible package source is mirrored in [`release/`](item-giver-mode/release/).
+- Latest tested release: `Item_Giver_Mode_v0.1.4_Deltamod.zip`; reproducible package source is mirrored in [`release/`](item-giver-mode/release/).
 - Adds an F7 debug-style item browser to Chapters 1–5.
 - Supports consumable items, weapons, armor, key items, and Light World items.
-- v0.1.3 moves input and GUI handling to DELTARUNE's native persistent `obj_time` controller instead of a dynamically created runtime object.
+- Uses DELTARUNE's native persistent `obj_time` controller for input and Draw GUI End for a clean overlay above the game's own menus.
 - Reads the final item tables at runtime, allowing named items from compatible mods to appear.
 - Includes source CSX patches, metadata, license, and a validation report.
 
