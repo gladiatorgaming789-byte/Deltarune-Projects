@@ -6,11 +6,12 @@ Deltamod-compatible compatibility merge targeting the supplied Windows launcher 
 
 **Version 1.0.7 — Graze sprite canvas hotfix**
 
-- Workspace archive: `DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip`
+- [Download `DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip`](release/DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip)
+- ZIP size: **14,416,671 bytes**
 - ZIP SHA-256: `f6d0fa4ed8328b283f47fc95ebb5ff0c2c17527bede19a56c2c5bacf1f3e3b61`
 - Deltamod package ID: `gladiatorgaming.deltarune.compatibilitymerge`
 
-The project is archived here as a folder because the connected GitHub writer cannot transfer the 14 MB binary workspace ZIP. The repository contains the package control files, exact binary/output manifests, complete release history, credits, compatibility decisions, and validation results. See [`release/README.md`](release/README.md).
+The repository ZIP was checked against the locally validated release using its Git blob SHA and is byte-for-byte identical.
 
 ## Fully merged
 
@@ -22,7 +23,7 @@ The project is archived here as a folder because the connected GitHub writer can
 - New ACTs in the Knight Fight 2.7 — ToyBoyC
   - Selected variant: **Normal**
 
-The requested Pink Fight `pink.ogg` override is included in the validated workspace release. The visual Pink Background patch is excluded because it targets an incompatible legacy Chapter 5 source and forced application corrupts pointer-bearing GameMaker resources.
+The requested Pink Fight `pink.ogg` override is included. The visual Pink Background patch is excluded because it targets an incompatible legacy Chapter 5 source and forced application corrupts pointer-bearing GameMaker resources.
 
 ## Latest changes
 
@@ -55,6 +56,7 @@ deltarune-compatibility-merge/
 │   └── package-file-hashes.txt
 └── release/
     ├── BINARY-MANIFEST.md
+    ├── DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip
     ├── README.md
     └── SHA256SUMS.txt
 ```
@@ -65,6 +67,7 @@ deltarune-compatibility-merge/
 - Every final xdelta was decoded against its exact clean source and compared byte-for-byte with the intended output.
 - The packaged ZIP was extracted and retested from its packaged patch copies.
 - Exact source hashes in `package/meta.json` prevent installation against unsupported game builds.
+- The GitHub ZIP blob matches the locally validated ZIP exactly.
 - A complete beginning-to-end playthrough of every route and difficulty combination is not claimed.
 
 See [the detailed validation report](docs/VALIDATION.md) and [full changelog](docs/CHANGELOG.md).
