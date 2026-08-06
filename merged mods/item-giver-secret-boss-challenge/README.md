@@ -21,6 +21,20 @@ Install `Item_Giver_Secret_Boss_Challenge_Merged_v0.1.0_Deltamod.zip` through De
 
 Package ID: `github.gladiatorgaming.itemgiversecretbossmerge`
 
+Tested release SHA-256: `374b4e5dff51bf4d1995c43b33e2ac1b0e9274afef20e3f361e5dfe904cb7972`
+
+## Repository package source
+
+The repository stores this release as the reproducible [`package/`](package/) folder rather than keeping an unverified binary ZIP copy.
+
+From a clone of the `all-projects` branch, run:
+
+```text
+python "merged mods/item-giver-secret-boss-challenge/package/build_release.py"
+```
+
+The builder reads the archived Item Giver v0.1.4 source and Secret Boss Challenge v0.4.0 release already present in this repository, regenerates the five `patches/*.csx` files, and creates the Deltamod ZIP. The generated CSX files were checked byte-for-byte against the scripts used for the tested release.
+
 ## Item Giver controls
 
 | Key | Action |
