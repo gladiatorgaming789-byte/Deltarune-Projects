@@ -15,36 +15,43 @@
 1. Both CSX scripts load, compile, and write rebuilt game files with UndertaleModTool CLI.
 2. Rebuilt files reopen successfully.
 3. Changed code entries round-trip decompile to the intended mod logic.
-4. The CONFIG menu toggle, conditional challenge stats, dual-reward paths, and inventory-full recovery logic remain present.
+4. The CONFIG toggle, conditional challenge stats, dual-reward paths, and inventory-full recovery logic remain present.
 5. The rebuilt Chapter 1 and Chapter 2 files previously entered the GameMaker main loop in Wine smoke tests.
 
 ## Chapter 5 implementation checks
 
+### CONFIG integration
+
+- Chapter 5 loads `SECRET_BOSS_CHALLENGE` from `true_config.ini`.
+- The CONFIG menu contains a Boss Challenge OFF/ON row.
+- The new row has keyboard/controller navigation, persistent writing, and adjusted Return/Back rows.
+
+### Pink Scarf
+
+- Uses weapon ID `38`, preserving v0.2.0 inventory migration.
+- Character: Ralsei.
+- Stats: 8 AT, 4 DF, 12 MAG.
+- Name, description, character reactions, icon, value, and equip restriction are defined through `scr_weaponinfo`.
+- Save flag `2490` tracks the grant.
+
 ### Pink's Staff
 
-- Added as Chapter 5 weapon ID `38`, an unused weapon slot in the tested build.
-- Name: `Pink's Staff`
-- Character: Kris only
-- Stats: 8 AT, 4 DF, 12 MAG
-- Name, description, character reactions, standard Kris weapon icon, value, and Kris-only equip restriction are defined through `scr_weaponinfo`.
+- Uses weapon ID `39`, unused in the tested Chapter 5 build.
+- Character: Kris.
+- Stats: 14 AT, 2 DF, 4 MAG.
+- Eligibility requires `global.flag[1914] == 2` (Meaner Bombs) and Boss Challenge ON at Pink's defeat.
+- Save flag `2492` records one of four states: legacy/unknown, granted, eligible-pending, or ineligible.
+- Changing Boss Challenge after a v0.3.0 clear does not change the recorded eligibility.
 - Weapon inventory and equipped-item checks prevent duplicate grants.
 
-### Pink reward
+### Pink Coins and flower shop
 
-- Pink's reward sequence grants Pink's Staff and 3 Pink Coins.
-- Save flag `2490` tracks the staff grant.
-- Save flag `2491` tracks the Pink Coin grant.
-- The coin total uses the game's existing `global.flag[1312]` Pink Coin counter.
-- The coin reward is one-time even if the staff remains pending because storage is full.
-- Existing saves with Pink's defeat flag set receive the reward upon entering the flower shop.
-- Full WEAPON storage leaves the staff pending and retries the grant on a later shop visit.
-
-### Flower shop
-
-- The introductory text now says to choose four flowers.
+- Pink grants 3 Pink Coins through the existing `global.flag[1312]` counter.
+- Save flag `2491` makes the coin reward one-time.
+- The introductory text says to choose four flowers.
 - Four regular flower purchases are allowed before the Flowery podium transition.
-- Flowery's special scarf remains the final purchase after the four regular choices.
-- Shop completion and podium-removal thresholds were moved consistently from 4 to 5 total purchases.
+- Flowery's special scarf remains the fifth and final purchase.
+- Full WEAPON storage leaves either equipment reward pending for later shop recovery.
 
 ## Compilation and round-trip checks
 
@@ -52,27 +59,39 @@
 2. UndertaleModTool compiled and wrote the rebuilt file successfully.
 3. Reopened the rebuilt file and dumped every changed code entry.
 4. Confirmed the decompiled output contains:
-   - Pink's Staff definition, stats, Kris-only equip flag, and weapon icon
-   - one-time staff and coin flags
-   - full-inventory recovery path
-   - four-choice shop dialogue
-   - updated four/five purchase thresholds
+   - Chapter 5 Boss Challenge CONFIG logic
+   - Pink Scarf and Pink's Staff definitions and equip restrictions
+   - Meaner Bombs plus Boss Challenge eligibility test
+   - one-time scarf, staff, and coin states
+   - full-inventory recovery logic
+   - four-choice shop dialogue and updated purchase thresholds
 5. Applied the same Chapter 5 patch a second time.
-6. The second application succeeded and produced a byte-identical output file, validating patch idempotency and duplicate-reward protection.
+6. The second application succeeded and produced a byte-identical output file.
+
+The rebuilt Chapter 5 output SHA-256 was:
+
+`0a0cb70cfc2dbf8849e856dbf169255389980f93f9d1a8f0f1e0e25271613b0d`
 
 ## Debug Mode v4.01 compatibility
 
 Both Chapter 5 patch orders compiled successfully:
 
-1. Clean Chapter 5 → Debug Mode v4.01 → Secret Boss Challenge v0.2.1
-2. Clean Chapter 5 → Secret Boss Challenge v0.2.1 → Debug Mode v4.01
+1. Clean Chapter 5 → Debug Mode v4.01 → Secret Boss Challenge v0.3.0
+2. Clean Chapter 5 → Secret Boss Challenge v0.3.0 → Debug Mode v4.01
 
-Round-trip decompilation of both outputs confirmed that Pink's Staff remained Kris-only, along with the one-time reward flags, reward messages, and expanded flower-shop thresholds.
+Both outputs reopened and round-trip decompiled successfully. The following remained present in both orders:
+
+- Pink Scarf and Pink's Staff
+- Kris/Ralsei equip restrictions
+- Meaner Bombs and Boss Challenge eligibility
+- one-time reward states
+- Chapter 5 CONFIG toggle
+- expanded flower-shop thresholds
 
 ## Deltamod package validation
 
 - `meta.json` parses as valid JSON.
-- Nested `metadata.version` is `0.2.1`.
+- Nested `metadata.version` is `0.3.0`.
 - The package ID remains `github.secretbosschallenge.gladiatorgaming` for in-place updates.
 - `neededFiles` contains the verified Chapter 1, Chapter 2, and Chapter 5 checksums.
 - `modding.xml` contains three `type="csx"` entries.
@@ -82,6 +101,10 @@ Round-trip decompilation of both outputs confirmed that Pink's Staff remained Kr
 - Applying the Chapter 5 script extracted from the final ZIP produced a byte-identical copy of the tested rebuilt file.
 - No original game executable, `data.win`, audio, or full decompiled source is included.
 
+Release ZIP SHA-256:
+
+`c706105490860ee8d6306998bc6f5240eda59c266ab2ca4ae55ac3b3a8bf8a30`
+
 ## Not completed
 
-A full manual playthrough of Pink's encounter, every possible inventory state, every four-flower selection order, and the final Flowery purchase was not performed in the headless workspace. These paths were validated through source inspection, successful compilation, round-trip decompilation, idempotency testing, and cross-mod patch-order testing.
+A full manual playthrough of Pink's encounter, every inventory state, every four-flower selection order, and the final Flowery purchase was not performed in the headless workspace. These paths were validated through source inspection, successful compilation, round-trip decompilation, idempotency testing, and cross-mod patch-order testing.
