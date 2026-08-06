@@ -1,6 +1,6 @@
 # Mods
 
-This folder contains the completed DELTARUNE projects published through this workspace's mod-development workflow.
+This folder contains completed **original standalone DELTARUNE mods**.
 
 ## Published projects
 
@@ -13,30 +13,18 @@ Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 - Adds optional secret-boss challenge behavior and enhanced rewards across Chapters 1, 2, and 5.
 - Packaged as Deltamod-compatible CSX patches.
 
-### DELTARUNE Compatibility Merge
-
-Folder: [`deltarune-compatibility-merge/`](deltarune-compatibility-merge/README.md)
-
-- Completed merge documentation for version 1.0.7.
-- Documents the included mod set, Pink Fight audio handling, sprite hotfix, hashes, and validation.
-- No distributable ZIP is currently stored in the repository, so the completed project is preserved as a folder rather than an empty or misleading archive.
-
 ## Project layout
-
-Each project uses its own clearly named folder:
 
 ```text
 mods/
-├── secret-boss-challenge/
-│   ├── README.md
-│   ├── LICENSE
-│   ├── Secret_Boss_Challenge_v0.4.0_Deltamod.zip
-│   └── tests/
-└── deltarune-compatibility-merge/
-    └── README.md
+└── secret-boss-challenge/
+    ├── README.md
+    ├── LICENSE
+    ├── Secret_Boss_Challenge_v0.4.0_Deltamod.zip
+    └── tests/
 ```
 
-Additional source files and release archives may be added inside the same project folder as they become available. Existing projects should be updated in place rather than duplicated under new folder names.
+Merged builds do not belong in this folder. They must be placed under [`merged mods/`](../merged%20mods/README.md).
 
 ## Archive requirements
 

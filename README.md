@@ -8,16 +8,19 @@ All releases in this branch are organized by project type and must be packaged f
 
 | Category | Purpose |
 |---|---|
-| [Mods](mods/README.md) | Completed projects maintained through the mod-development workflow. |
+| [Mods](mods/README.md) | Original standalone mods. |
 | [Merged Mods](merged%20mods/README.md) | Compatibility builds that combine two or more existing mods. |
 | [Compatibility Fixed Mods](compatibility%20fixed%20mods/README.md) | Existing mods updated for newer DELTARUNE versions or repaired for Deltamod. |
 
 ## Published projects
 
-The `mods/` archive currently contains:
+### Mods
 
 - [Secret Boss Challenge](mods/secret-boss-challenge/README.md) — Deltamod release packages, documentation, license, and validation report.
-- [DELTARUNE Compatibility Merge](mods/deltarune-compatibility-merge/README.md) — completed merge documentation and validation notes. A release ZIP is not currently stored in the repository, so the project is archived as a folder.
+
+### Merged Mods
+
+- [DELTARUNE Compatibility Merge](merged%20mods/deltarune-compatibility-merge/README.md) — completed merge documentation and validation notes. A release ZIP is not currently stored in the repository, so the project is archived as a folder.
 
 ## Branch guide
 
@@ -40,12 +43,14 @@ A project should be added to this branch only when it includes the materials cur
 
 ## Repository rules
 
-- Completed work is placed in its own folder under `mods/` for this workflow.
+- Put original standalone mods under `mods/`.
+- Put merged builds under `merged mods/`.
+- Put repaired or updated existing mods under `compatibility fixed mods/`.
+- Keep each project in its own folder within the correct category.
 - Update an existing project in place instead of creating duplicate folders.
 - Development, compilation, and testing happen in the workspace rather than temporary GitHub branches.
 - Preserve original authorship and licensing information for repaired or merged mods.
 - Do not commit original DELTARUNE executables, `data.win` files, music, or other copyrighted game assets.
-- Do not publish a release that bypasses Deltamod or requires users to overwrite game files manually unless the project documentation clearly explains an unavoidable exception.
 
 ## Deltamod compatibility
 

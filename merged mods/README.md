@@ -4,20 +4,25 @@ This folder contains completed **Deltamod-compatible merged builds** that combin
 
 ## Published projects
 
-_No completed merged build has been archived here yet._
+### DELTARUNE Compatibility Merge
 
-Merged builds remain on the `merged-mods` branch while conflicts are being resolved and validation is still in progress.
+Folder: [`deltarune-compatibility-merge/`](deltarune-compatibility-merge/README.md)
+
+- Current documented version: **1.0.7**
+- Combines multiple DELTARUNE mods into one compatibility-tested project.
+- Documents the included mod set, Pink Fight audio handling, graze sprite hotfix, hashes, and validation.
+- No distributable ZIP is currently stored in the repository, so the completed project is preserved as a folder rather than an empty or misleading archive.
 
 ## What belongs here
 
-A merged build should be used when two or more mods change the same DELTARUNE resources and cannot be safely installed side by side. It must preserve the intended behavior of each source mod as closely as possible.
+A merged build belongs here when two or more mods are combined into one compatibility-tested project, especially when they modify overlapping DELTARUNE resources.
 
-Each project folder should include:
+Each project folder should include the materials currently available for that completed merge:
 
-- A Deltamod-compatible release archive.
+- A Deltamod-compatible release archive when one is available.
 - A README naming every included mod, version, author, and selected variant.
 - Clear notes about compromises, omitted components, and unresolved conflicts.
-- Installation and update instructions.
+- Installation and update instructions when a release exists.
 - Compatibility information for each affected chapter.
 - Validation results for patching, launching, and important gameplay behavior.
 - Credits and licensing information for all source projects.
@@ -29,17 +34,14 @@ Each project folder should include:
 - Prefer source-level or resource-level merging over overwriting one mod with another.
 - Keep checksums and patch anchors strict enough to stop on an unsupported game version.
 - Re-test every affected chapter after changing the merge.
-- Confirm that the final package installs through Deltamod.
+- Confirm that installable packages work through Deltamod.
 
-## Suggested project layout
+## Project layout
 
 ```text
 merged mods/
-└── merge-name/
-    ├── README.md
-    ├── Merge_Name_v1.0.0_Deltamod.zip
-    ├── source-or-patches/
-    └── tests/
+└── deltarune-compatibility-merge/
+    └── README.md
 ```
 
 [Return to the archive index](../README.md)
