@@ -19,10 +19,10 @@ if (!displayName.Contains("chapter 1") && !displayName.Contains("chapitre 1"))
     return;
 }
 
-const string marker = "__ITEM_GIVER_MODE_V013__";
+const string marker = "__ITEM_GIVER_MODE_V014__";
 if (Data.Strings.Any(x => x?.Content == marker))
 {
-    ScriptMessage("Item Giver v0.1.3 is already installed for Chapter 1.");
+    ScriptMessage("Item Giver v0.1.4 is already installed for Chapter 1.");
     return;
 }
 Data.Strings.MakeString(marker);
@@ -42,7 +42,7 @@ if (objTime == null)
 }
 
 importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Create, (uint)0, Data),
-@"ig_itemgiver_version = ""0.1.3"";
+@"ig_itemgiver_version = ""0.1.4"";
 ig_menu_open = false;
 ig_lists_built = false;
 ig_category = 0;
@@ -97,11 +97,11 @@ ig_get_name = function(_index)
 {
     switch (ig_category)
     {
-        case 0: return ig_item_names[_index];
-        case 1: return ig_weapon_names[_index];
-        case 2: return ig_armor_names[_index];
-        case 3: return ig_key_names[_index];
-        case 4: return ig_light_names[_index];
+        case 0: return string_replace_all(ig_item_names[_index], ""#"", "" "");
+        case 1: return string_replace_all(ig_weapon_names[_index], ""#"", "" "");
+        case 2: return string_replace_all(ig_armor_names[_index], ""#"", "" "");
+        case 3: return string_replace_all(ig_key_names[_index], ""#"", "" "");
+        case 4: return string_replace_all(ig_light_names[_index], ""#"", "" "");
     }
     return """";
 };
@@ -386,7 +386,7 @@ else
     }
 }");
 
-importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Draw, (uint)64, Data),
+importGroup.QueueAppend(objTime.EventHandlerFor(EventType.Draw, (uint)75, Data),
 @"var _old_font = draw_get_font();
 var _old_color = draw_get_color();
 var _old_alpha = draw_get_alpha();
@@ -397,98 +397,126 @@ draw_set_font(fnt_main);
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 
+var _gw = display_get_gui_width();
+var _gh = display_get_gui_height();
+
 if (!ig_menu_open)
 {
     if (ig_status_timer > 0)
     {
-        draw_set_alpha(0.88);
+        var _toast_w = min(440, _gw - 24);
+        var _toast_x = (_gw - _toast_w) * 0.5;
+        draw_set_alpha(0.94);
         draw_set_color(c_black);
-        draw_rectangle(120, 16, 520, 48, false);
+        draw_rectangle(_toast_x, 12, _toast_x + _toast_w, 45, false);
         draw_set_alpha(1);
         draw_set_color(ig_status_ok ? c_lime : c_red);
         draw_set_halign(fa_center);
-        draw_text(320, 23, ig_status_text);
+        draw_text_ext(_gw * 0.5, 20, ig_status_text, 16, _toast_w - 20);
     }
-
-    draw_set_halign(_old_halign);
-    draw_set_valign(_old_valign);
-    draw_set_font(_old_font);
-    draw_set_color(_old_color);
-    draw_set_alpha(_old_alpha);
-    exit;
 }
-
-draw_set_alpha(0.94);
-draw_set_color(make_color_rgb(12, 12, 20));
-draw_rectangle(18, 18, 622, 462, false);
-draw_set_alpha(1);
-draw_set_color(c_white);
-draw_rectangle(18, 18, 622, 462, true);
-
-draw_set_halign(fa_center);
-draw_set_color(c_fuchsia);
-draw_text(320, 31, ""ITEM GIVER"");
-draw_set_color(c_white);
-draw_text(320, 53, ""<  "" + ig_category_names[ig_category] + ""  >"");
-
-var _count = ig_get_count();
-draw_set_halign(fa_left);
-draw_set_color(c_gray);
-draw_text(37, 73, ""ID"");
-draw_text(78, 73, ""NAME"");
-draw_set_halign(fa_right);
-draw_text(603, 73, string(ig_selected + 1) + "" / "" + string(_count));
-
-var _visible = 10;
-var _start = clamp(ig_selected - 4, 0, max(0, _count - _visible));
-for (var _row = 0; _row < _visible; _row++)
+else
 {
-    var _index = _start + _row;
-    if (_index >= _count)
-        break;
+    var _panel_w = min(616, _gw - 24);
+    var _panel_h = min(456, _gh - 24);
+    var _px = (_gw - _panel_w) * 0.5;
+    var _py = (_gh - _panel_h) * 0.5;
+    var _left = _px + 18;
+    var _right = _px + _panel_w - 18;
+    var _inner_w = _panel_w - 36;
 
-    var _y = 94 + (_row * 22);
-    var _id = ig_get_id(_index);
-    var _name = ig_get_name(_index);
-    if (_index == ig_selected)
+    draw_set_alpha(0.72);
+    draw_set_color(c_black);
+    draw_rectangle(0, 0, _gw, _gh, false);
+
+    draw_set_alpha(0.985);
+    draw_set_color(make_color_rgb(12, 12, 20));
+    draw_rectangle(_px, _py, _px + _panel_w, _py + _panel_h, false);
+    draw_set_alpha(1);
+    draw_set_color(c_white);
+    draw_rectangle(_px, _py, _px + _panel_w, _py + _panel_h, true);
+
+    draw_set_halign(fa_center);
+    draw_set_color(c_fuchsia);
+    draw_text(_gw * 0.5, _py + 14, ""ITEM GIVER"");
+    draw_set_color(c_white);
+    draw_text(_gw * 0.5, _py + 37, ""<  "" + ig_category_names[ig_category] + ""  >"");
+
+    var _count = ig_get_count();
+    draw_set_halign(fa_left);
+    draw_set_color(c_gray);
+    draw_text(_left + 6, _py + 65, ""ID"");
+    draw_text(_left + 55, _py + 65, ""NAME"");
+    draw_set_halign(fa_right);
+    draw_text(_right - 4, _py + 65, string(ig_selected + 1) + "" / "" + string(_count));
+
+    var _visible = 9;
+    var _row_h = 21;
+    var _list_y = _py + 86;
+    var _start = clamp(ig_selected - 4, 0, max(0, _count - _visible));
+    for (var _row = 0; _row < _visible; _row++)
     {
-        draw_set_alpha(0.25);
-        draw_set_color(c_fuchsia);
-        draw_rectangle(31, _y - 2, 609, _y + 18, false);
-        draw_set_alpha(1);
-        draw_set_color(c_yellow);
-        draw_text(37, _y, ""> "" + string(_id));
-        draw_text(78, _y, _name);
+        var _index = _start + _row;
+        if (_index >= _count)
+            break;
+
+        var _y = _list_y + (_row * _row_h);
+        var _id = ig_get_id(_index);
+        var _name = ig_get_name(_index);
+        if (string_length(_name) > 30)
+            _name = string_copy(_name, 1, 27) + ""..."";
+
+        if (_index == ig_selected)
+        {
+            draw_set_alpha(0.28);
+            draw_set_color(c_fuchsia);
+            draw_rectangle(_left, _y - 2, _right, _y + 18, false);
+            draw_set_alpha(1);
+            draw_set_color(c_yellow);
+            draw_set_halign(fa_left);
+            draw_text(_left + 6, _y, ""> "" + string(_id));
+            draw_text(_left + 55, _y, _name);
+        }
+        else
+        {
+            draw_set_color(c_white);
+            draw_set_halign(fa_left);
+            draw_text(_left + 6, _y, string(_id));
+            draw_text(_left + 55, _y, _name);
+        }
     }
-    else
+
+    var _sep_y = _py + 284;
+    draw_set_color(c_gray);
+    draw_line(_left, _sep_y, _right, _sep_y);
+
+    draw_set_halign(fa_left);
+    draw_set_color(c_yellow);
+    var _preview_title = ig_preview_name;
+    if (string_length(_preview_title) > 34)
+        _preview_title = string_copy(_preview_title, 1, 31) + ""..."";
+    draw_text(_left + 6, _sep_y + 10, _preview_title + ""  [ID "" + string(ig_preview_id) + ""]"");
+
+    draw_set_color(c_white);
+    var _desc = string_hash_to_newline(ig_preview_desc);
+    draw_text_ext(_left + 6, _sep_y + 33, _desc, 16, _inner_w - 12);
+
+    if (string_length(ig_preview_extra) > 0)
     {
-        draw_set_color(c_white);
-        draw_text(37, _y, string(_id));
-        draw_text(78, _y, _name);
+        draw_set_color(c_aqua);
+        draw_text_ext(_left + 6, _py + _panel_h - 76, string_replace_all(ig_preview_extra, ""#"", "" ""), 16, _inner_w - 12);
     }
-}
 
-draw_set_color(c_gray);
-draw_line(31, 318, 609, 318);
-draw_set_color(c_yellow);
-draw_text(37, 327, ig_preview_name + ""  [ID "" + string(ig_preview_id) + ""]"");
-draw_set_color(c_white);
-draw_text(37, 350, string_hash_to_newline(ig_preview_desc));
-if (string_length(ig_preview_extra) > 0)
-{
-    draw_set_color(c_aqua);
-    draw_text(37, 395, ig_preview_extra);
-}
+    if (ig_status_timer > 0)
+    {
+        draw_set_color(ig_status_ok ? c_lime : c_red);
+        draw_text_ext(_left + 6, _py + _panel_h - 55, string_replace_all(ig_status_text, ""#"", "" ""), 16, _inner_w - 12);
+    }
 
-if (ig_status_timer > 0)
-{
-    draw_set_color(ig_status_ok ? c_lime : c_red);
-    draw_text(37, 417, ig_status_text);
+    draw_set_color(c_gray);
+    draw_set_halign(fa_center);
+    draw_text(_gw * 0.5, _py + _panel_h - 24, ""Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F7: Close"");
 }
-
-draw_set_color(c_gray);
-draw_set_halign(fa_center);
-draw_text(320, 440, ""Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F7: Close"");
 
 draw_set_halign(_old_halign);
 draw_set_valign(_old_valign);
@@ -503,4 +531,4 @@ importGroup.QueueAppend(objTime.EventHandlerFor(EventType.CleanUp, (uint)0, Data
 ");
 
 importGroup.Import();
-ScriptMessage("Item Giver v0.1.3 installed for Chapter 1. Press F7 outside battle.");
+ScriptMessage("Item Giver v0.1.4 installed for Chapter 1. Press F7 outside battle.");
