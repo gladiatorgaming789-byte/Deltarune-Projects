@@ -22,6 +22,7 @@ Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 - Supports consumable items, weapons, armor, key items, and Light World items.
 - Uses DELTARUNE's native persistent `obj_time` controller for input and Draw GUI End for a clean overlay above the game's own menus.
 - Reads the final item tables at runtime, allowing named items from compatible mods to appear.
+- When using Secret Boss Challenge, use the dedicated [`Item Giver + Secret Boss Challenge`](../merged%20mods/item-giver-secret-boss-challenge/README.md) merged build instead of enabling the two standalone packages together.
 - Includes source CSX patches, metadata, license, and a validation report.
 
 ## Project layout

@@ -78,7 +78,9 @@ The item card reports `Shield / Graze +10%`, and the standard graze-stat metadat
 
 ## Installation
 
-Install `Secret_Boss_Challenge_v0.4.0_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
+Install `Secret_Boss_Challenge_v0.4.0_Deltamod.zip` directly through Deltamod when using Secret Boss Challenge by itself. Do not extract the archive into the game manually.
+
+If Item Giver Mode is also wanted, use the dedicated [`Item Giver + Secret Boss Challenge`](../../merged%20mods/item-giver-secret-boss-challenge/README.md) compatibility build instead and disable/remove both standalone copies.
 
 The package ID remains `github.secretbosschallenge.gladiatorgaming`, so v0.4.0 updates an existing installation.
 
@@ -99,6 +101,8 @@ The release metadata checks the exact game files used during development:
 - Chapter 5 SHA-256: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
 The Chapter 5 patch was tested with Debug Mode v4.01 in both patch orders. Mods changing unrelated code can coexist. A mod changing the same CONFIG, Pink reward, weapon table, spell, damage, graze, or flower-shop anchors may require a dedicated merged build.
+
+Item Giver Mode is a documented special case: use the dedicated merged package rather than enabling the two standalone Deltamod packages together.
 
 A newer DELTARUNE update may require regenerated anchors and checksums. The scripts stop instead of applying to an unknown layout.
 

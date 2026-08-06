@@ -13,17 +13,33 @@ Folder: [`deltarune-compatibility-merge/`](deltarune-compatibility-merge/README.
 - Combines Custom Difficulty, Better Saves, 60 FPS, Chapter 1 Modernized, No-Hat Ralsei, and New ACTs in the Knight Fight.
 - Includes package metadata, patch/output hashes, binary manifest, source-mod credits, complete changelog, and validation report.
 
+### Item Giver + Secret Boss Challenge
+
+Folder: [`item-giver-secret-boss-challenge/`](item-giver-secret-boss-challenge/README.md)
+
+- Current version: **0.1.0**
+- Combines Item Giver Mode v0.1.4 and Secret Boss Challenge v0.4.0.
+- Uses one Deltamod CSX per chapter so both source patches are materialized together rather than depending on cross-mod G3MTool merging.
+- Chapters 1, 2, and 5 include both mods; Chapters 3 and 4 include Item Giver because Secret Boss Challenge does not target those chapters.
+- Includes exact output hashes, idempotency checks, Debug Mode compatibility checks, and a validation report; the release ZIP contains the source CSX scripts.
+
 ## Folder layout
 
 ```text
 merged mods/
 ├── README.md
-└── deltarune-compatibility-merge/
+├── deltarune-compatibility-merge/
+│   ├── README.md
+│   ├── docs/
+│   ├── package/
+│   └── release/
+│       └── DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip
+└── item-giver-secret-boss-challenge/
     ├── README.md
-    ├── docs/
-    ├── package/
-    └── release/
-        └── DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip
+    ├── LICENSES.md
+    ├── release/
+    │   └── Item_Giver_Secret_Boss_Challenge_Merged_v0.1.0_Deltamod.zip
+    └── tests/
 ```
 
 ## Publishing standards

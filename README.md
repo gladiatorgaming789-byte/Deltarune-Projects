@@ -26,6 +26,7 @@ All completed work is organized by project type. Installable builds must remain 
   - F7 item browser for Chapters 1–5
   - Items, weapons, armor, key items, and Light World items
   - Uses DELTARUNE's native persistent `obj_time` controller and Draw GUI End for reliable input and clean overlay rendering
+  - Use the dedicated merged build below when Secret Boss Challenge is also enabled
   - Source CSX patches and validation report
 
 ### Merged mods
@@ -37,6 +38,11 @@ All completed work is organized by project type. Installable builds must remain 
   - Exact source, patch, override, release, and output hashes
   - Source-mod credits and compatibility decisions
   - Complete changelog and validation report
+- [Item Giver + Secret Boss Challenge](merged%20mods/item-giver-secret-boss-challenge/README.md)
+  - Current version: **0.1.0**
+  - Combines Item Giver Mode v0.1.4 and Secret Boss Challenge v0.4.0 in one Deltamod package
+  - Avoids relying on Deltamod/G3MTool cross-mod materialization for these two CSX mods
+  - Includes source CSX scripts in the release archive and a validation report
 
 ## Branch guide
 

@@ -46,12 +46,14 @@ Some key items and unused/developer items depend on plot flags or scripted acqui
 
 - Deltamod CSX patches for Chapters 1–5.
 - Debug Mode v4.01 compiles successfully before and after Item Giver Mode in all five chapters.
-- Secret Boss Challenge v0.4.0 compiles successfully before and after Item Giver Mode in Chapter 5.
+- **Secret Boss Challenge:** do not rely on enabling the standalone Item Giver and standalone Secret Boss Challenge packages together. Deltamod's cross-mod merge path does not reproduce the sequential UTMT test used during early compatibility checks. Use the dedicated [`Item Giver + Secret Boss Challenge`](../../merged%20mods/item-giver-secret-boss-challenge/README.md) merged package instead.
 - Applying Item Giver Mode v0.1.4 twice produces byte-identical output in all five chapters.
 
 ## Installation
 
-Install `Item_Giver_Mode_v0.1.4_Deltamod.zip` directly through Deltamod.
+Install `Item_Giver_Mode_v0.1.4_Deltamod.zip` directly through Deltamod when using Item Giver by itself.
+
+If Secret Boss Challenge is also wanted, install the dedicated merged package instead and disable/remove both standalone copies.
 
 The GitHub project mirrors the tested package source under [`release/`](release/). Run `build_release.py` there to generate the five chapter scripts, then ZIP the release-folder contents so `meta.json` and `modding.xml` are at the archive root.
 
