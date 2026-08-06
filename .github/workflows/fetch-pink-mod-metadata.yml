@@ -1,0 +1,40 @@
+name: Fetch Pink mod metadata
+
+on:
+  push:
+    branches: [merged-mods]
+    paths:
+      - .github/workflows/fetch-pink-mod-metadata.yml
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query public GameBanana APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          curl -fL --retry 3 --compressed \
+            'https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=691730&fields=name,mdate,Files().aFiles(),Updates().aLatestUpdates(),Updates().aGetLatestUpdates(),screenshots,Preview().sStructuredDataFullsizeUrl()&return_keys=1&format=json' \
+            -o out/core-item-data.json || true
+          curl -fL --retry 3 --compressed \
+            'https://gamebanana.com/apiv11/Mod/691730/ProfilePage' \
+            -o out/profile-page.json || true
+          curl -fL --retry 3 --compressed \
+            'https://gamebanana.com/apiv11/Mod/691730/Updates' \
+            -o out/updates.json || true
+          for f in out/*; do
+            echo "===== $f ====="
+            head -c 1000 "$f" || true
+            echo
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pink-mod-metadata
+          path: out
+          if-no-files-found: error
