@@ -1,6 +1,11 @@
-Item Giver Mode v0.1.1
+Item Giver Mode v0.1.2
 
 Install this ZIP directly through Deltamod. Keep the archive intact.
+
+WHAT CHANGED IN v0.1.2
+- Fixed the startup crash caused by DELTARUNE's instance_create wrapper trying to look up the dynamically added Item Giver object's depth in __objectID2Depth.
+- Item Giver is now created with instance_create_depth at an explicit depth, bypassing that internal lookup.
+- F7 remains the menu hotkey.
 
 OPENING THE MENU
 - Press F7 outside battle to open or close Item Giver Mode.
@@ -30,9 +35,8 @@ This is a debug utility. Some key items and unused/developer items are tied to p
 COMPATIBILITY
 - Deltamod-compatible CSX patches for Chapters 1-5.
 - F7 does not overlap Debug Mode v4.01's current function-key shortcuts.
-- Tested with Debug Mode v4.01 before and after Item Giver Mode in every chapter for v0.1.0; v0.1.1 changes only the hotkey.
-- Tested with Secret Boss Challenge v0.4.0 before and after Item Giver Mode in Chapters 1, 2, and 5.
-- The Chapter 5 item browser detects Pink Scarf and Pink's Staff when Secret Boss Challenge is installed.
-- Applying the same Item Giver v0.1.1 patch twice produces a byte-identical data.win in every chapter.
+- The v0.1.2 startup fix is isolated to Item Giver's guarded scr_gamestart append.
+- Secret Boss Challenge compatibility behavior is unchanged from v0.1.1.
+- Applying the same v0.1.2 patch twice produces a byte-identical data.win in every chapter.
 
 Target: DELTARUNE Windows full release, launcher version v23.
