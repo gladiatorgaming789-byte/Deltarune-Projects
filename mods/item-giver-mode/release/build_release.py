@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Item Giver Mode v0.1.3's five Deltamod CSX scripts from the tested Chapter 1 template."""
+"""Build Item Giver Mode v0.1.4's five Deltamod CSX scripts from the tested Chapter 1 template."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
