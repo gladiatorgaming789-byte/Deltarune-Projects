@@ -20,6 +20,12 @@ All completed work is organized by project type. Installable builds must remain 
   - Versioned Deltamod ZIP releases
   - Source/project documentation
   - License and tests
+- [Item Giver Mode](mods/item-giver-mode/README.md)
+  - Current version: **0.1.0**
+  - [Download the Deltamod ZIP](mods/item-giver-mode/Item_Giver_Mode_v0.1.0_Deltamod.zip)
+  - F8 item browser for Chapters 1–5
+  - Items, weapons, armor, key items, and Light World items
+  - Source CSX patches and validation report
 
 ### Merged mods
 

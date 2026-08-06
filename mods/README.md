@@ -13,14 +13,29 @@ Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 - Adds optional secret-boss challenge behavior and enhanced rewards across Chapters 1, 2, and 5.
 - Packaged as Deltamod-compatible CSX patches.
 
+### Item Giver Mode
+
+Folder: [`item-giver-mode/`](item-giver-mode/README.md)
+
+- Latest release: [`Item_Giver_Mode_v0.1.0_Deltamod.zip`](item-giver-mode/Item_Giver_Mode_v0.1.0_Deltamod.zip)
+- Adds an F8 debug-style item browser to Chapters 1–5.
+- Supports consumable items, weapons, armor, key items, and Light World items.
+- Reads the final item tables at runtime, allowing named items from compatible mods to appear.
+- Includes source CSX patches, metadata, license, and a validation report.
+
 ## Project layout
 
 ```text
 mods/
-└── secret-boss-challenge/
+├── secret-boss-challenge/
+│   ├── README.md
+│   ├── LICENSE
+│   ├── Secret_Boss_Challenge_v0.4.0_Deltamod.zip
+│   └── tests/
+└── item-giver-mode/
     ├── README.md
     ├── LICENSE
-    ├── Secret_Boss_Challenge_v0.4.0_Deltamod.zip
+    ├── Item_Giver_Mode_v0.1.0_Deltamod.zip
     └── tests/
 ```
 
