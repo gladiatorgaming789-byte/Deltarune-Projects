@@ -1,6 +1,6 @@
 # Secret Boss Challenge
 
-**Version:** 0.3.0  
+**Version:** 0.3.1  
 **Target:** DELTARUNE full release, launcher version `v23`  
 **Chapters:** 1, 2, and 5  
 **Installer:** Deltamod-compatible UTMT `.csx` patches
@@ -22,35 +22,46 @@ When Boss Challenge is disabled, the original boss stats, patterns, rewards, and
 
 ### Chapter 5: Pink rewards
 
-The Boss Challenge toggle is now available in Chapter 5's CONFIG menu.
+The Boss Challenge toggle is available in Chapter 5's CONFIG menu.
 
-Defeating Pink always grants:
+#### Boss Challenge OFF
 
-- **Pink Scarf**, a Ralsei weapon with **8 AT, 4 DF, and 12 MAG**.
-- **3 additional Pink Coins**, protected by a one-time save state.
-- Enough Pink Coins to purchase one additional regular flower item.
+Defeating Pink keeps the original reward behavior and the original flower-shop progression:
 
-Defeating Pink while both conditions are active grants an additional reward:
+- No Pink Scarf
+- No bonus Pink Coins
+- Three regular flower purchases before Flowery's special scarf
+- No Pink's Staff, including on Meaner Bombs
 
-1. The bomb dial is set to **Meaner Bombs**.
-2. **Boss Challenge** is ON when Pink is defeated.
+#### Boss Challenge ON
 
-The additional reward is **Pink's Staff**, a Kris weapon with **14 AT, 2 DF, and 4 MAG**. Eligibility is recorded at the moment of victory, so enabling Boss Challenge afterward does not qualify a new clear.
+Defeating Pink grants:
 
-The flower shop permits **four regular flower purchases instead of three**. Flowery's special scarf remains available afterward as the fifth and final purchase.
+- **Pink Scarf**, a Ralsei weapon with **8 AT, 4 DF, and 12 MAG**
+- **3 additional Pink Coins**, protected by a one-time save state
+- A fourth regular flower-shop purchase before Flowery's special scarf
 
-## Existing saves and v0.2.0 migration
+Defeating Pink with both **Meaner Bombs** and **Boss Challenge ON** also grants:
 
-- Weapon ID `38`, used by v0.2.0's Pink's Staff, now defines Pink Scarf. Existing copies therefore migrate without being deleted.
-- Eligible v0.2.0 saves can receive the new Kris-only Pink's Staff from the flower shop.
-- If WEAPON storage is full, Pink Scarf or Pink's Staff remains pending and the flower shop retries the grant on later visits.
-- The Pink Coin and equipment rewards cannot be duplicated by reinstalling or reapplying the patch.
+- **Pink's Staff**, a Kris weapon with **14 AT, 2 DF, and 4 MAG**
+
+Reward eligibility is recorded when Pink is defeated. Enabling Boss Challenge afterward does not qualify an earlier clear.
+
+## Save migration and full inventories
+
+- Weapon ID `38` remains Pink Scarf, preserving the v0.2.x item-slot migration.
+- Weapon ID `39` remains Pink's Staff.
+- If WEAPON storage is full, an eligible item stays pending and the flower shop retries the grant later.
+- Pink Scarf, Pink's Staff, and the three Pink Coins use separate one-time save states.
+- Older completed clears without saved proof that Boss Challenge was active are treated as non-challenge clears. This prevents turning the option on later from granting rewards retroactively.
+- Saves that already used v0.3.0's unconditional fourth flower purchase retain compatible shop progression so Flowery's final item is not lost.
+- Rewards already granted by v0.3.0 are not removed from an existing save.
 
 ## Installation
 
-Install `Secret_Boss_Challenge_v0.3.0_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
+Install `Secret_Boss_Challenge_v0.3.1_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
 
-The package ID remains `github.secretbosschallenge.gladiatorgaming`, so v0.3.0 updates an existing installation.
+The package ID remains `github.secretbosschallenge.gladiatorgaming`, so v0.3.1 updates an existing installation.
 
 The archive patches:
 
