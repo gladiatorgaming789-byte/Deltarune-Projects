@@ -1,11 +1,11 @@
 # Secret Boss Challenge
 
-**Version:** 0.3.1  
+**Version:** 0.4.0  
 **Target:** DELTARUNE full release, launcher version `v23`  
 **Chapters:** 1, 2, and 5  
 **Installer:** Deltamod-compatible UTMT `.csx` patches
 
-Secret Boss Challenge adds a persistent **Boss Challenge: OFF/ON** setting and enhanced rewards for DELTARUNE's secret bosses.
+Secret Boss Challenge adds a persistent **Boss Challenge: OFF/ON** setting, harder secret-boss variants, and enhanced challenge rewards.
 
 ## Features
 
@@ -26,7 +26,7 @@ The Boss Challenge toggle is available in Chapter 5's CONFIG menu.
 
 #### Boss Challenge OFF
 
-Defeating Pink keeps the original reward behavior and the original flower-shop progression:
+Defeating Pink keeps the original reward behavior and flower-shop progression:
 
 - No Pink Scarf
 - No bonus Pink Coins
@@ -47,21 +47,40 @@ Defeating Pink with both **Meaner Bombs** and **Boss Challenge ON** also grants:
 
 Reward eligibility is recorded when Pink is defeated. Enabling Boss Challenge afterward does not qualify an earlier clear.
 
+## Pink Scarf ability
+
+Equipping Pink Scarf on Ralsei unlocks **Shield** in Ralsei's battle spell menu.
+
+- Cost: **65% TP**
+- Target: one party member
+- Effect: reduces damage to that party member by approximately **75%**
+- Duration: the next enemy attack phase
+- Recasting Shield replaces the previously protected target
+- Applies to direct single-target hits and party-wide damage
+- Shield is cleared when the party regains control and is reset at the start of each battle
+
+Pink Scarf also provides a passive bonus while its wearer is in the active party:
+
+- Approximately **10% larger graze hitbox**
+- Approximately **10% more TP from grazing**
+
+The item card reports `Shield / Graze +10%`, and the standard graze-stat metadata is populated for equipment comparisons.
+
 ## Save migration and full inventories
 
 - Weapon ID `38` remains Pink Scarf, preserving the v0.2.x item-slot migration.
 - Weapon ID `39` remains Pink's Staff.
+- Spell ID `14` is used for Shield; it was unused in the tested Chapter 5 build.
 - If WEAPON storage is full, an eligible item stays pending and the flower shop retries the grant later.
 - Pink Scarf, Pink's Staff, and the three Pink Coins use separate one-time save states.
-- Older completed clears without saved proof that Boss Challenge was active are treated as non-challenge clears. This prevents turning the option on later from granting rewards retroactively.
-- Saves that already used v0.3.0's unconditional fourth flower purchase retain compatible shop progression so Flowery's final item is not lost.
-- Rewards already granted by v0.3.0 are not removed from an existing save.
+- Older completed clears without saved proof that Boss Challenge was active are treated as non-challenge clears.
+- Rewards already granted by earlier versions are not removed from existing saves.
 
 ## Installation
 
-Install `Secret_Boss_Challenge_v0.3.1_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
+Install `Secret_Boss_Challenge_v0.4.0_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
 
-The package ID remains `github.secretbosschallenge.gladiatorgaming`, so v0.3.1 updates an existing installation.
+The package ID remains `github.secretbosschallenge.gladiatorgaming`, so v0.4.0 updates an existing installation.
 
 The archive patches:
 
@@ -79,7 +98,7 @@ The release metadata checks the exact game files used during development:
 - Chapter 2 SHA-256: `047c5ab003e3e017a709c02757e119c81e0327760169512110fd276b19241e68`
 - Chapter 5 SHA-256: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
-The Chapter 5 patch was tested with Debug Mode v4.01 in both patch orders. Mods changing unrelated code can coexist. A mod changing the same CONFIG, Pink reward, weapon table, or flower-shop anchors may require a dedicated merged build.
+The Chapter 5 patch was tested with Debug Mode v4.01 in both patch orders. Mods changing unrelated code can coexist. A mod changing the same CONFIG, Pink reward, weapon table, spell, damage, graze, or flower-shop anchors may require a dedicated merged build.
 
 A newer DELTARUNE update may require regenerated anchors and checksums. The scripts stop instead of applying to an unknown layout.
 
