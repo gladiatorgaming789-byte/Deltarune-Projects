@@ -1,3 +1,0 @@
-count=36
-encoded_size=210936
-binary_sha256=dc6bdc6ee86b2b3e389c937610c0b2508e31ca53c197de6f9c176909c546a846

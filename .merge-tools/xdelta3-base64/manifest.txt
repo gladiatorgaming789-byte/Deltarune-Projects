@@ -1,5 +1,0 @@
-format=base64-chunks
-chunk_width=8000
-size=158200
-sha256=dc6bdc6ee86b2b3e389c937610c0b2508e31ca53c197de6f9c176909c546a846
-version=Xdelta version 3.0.11, Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Joshua MacDonald
