@@ -25,12 +25,11 @@ All completed work is organized by project type. Installable builds must remain 
 
 - [DELTARUNE Compatibility Merge](merged%20mods/deltarune-compatibility-merge/README.md)
   - Current version: **1.0.7**
+  - [Download the Deltamod ZIP](merged%20mods/deltarune-compatibility-merge/release/DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip)
   - Package metadata and Deltamod patch map
-  - Exact source, patch, override, and output hashes
-  - Binary payload manifest
+  - Exact source, patch, override, release, and output hashes
   - Source-mod credits and compatibility decisions
   - Complete changelog and validation report
-  - The validated binary ZIP remains in the current workspace because the connected GitHub writer cannot transfer the 14 MB artifact; the project is preserved here as a folder.
 
 ## Branch guide
 
@@ -45,12 +44,11 @@ All completed work is organized by project type. Installable builds must remain 
 
 A project belongs here when it includes the materials available for the completed work:
 
-- A Deltamod-compatible release archive when the connected writer can transfer it.
-- Otherwise, a complete project folder with metadata, manifests, validation, credits, and exact release hashes.
-- A README with features, compatibility information, known limitations, and installation or availability notes.
+- A Deltamod-compatible release archive when an installable build exists.
+- A README with features, compatibility information, known limitations, and installation notes.
 - Source patch scripts or other redistributable development files when available.
 - A validation or test report.
-- A clear latest version.
+- A clear latest version and release checksum.
 
 ## Repository rules
 
