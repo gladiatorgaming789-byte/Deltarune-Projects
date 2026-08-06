@@ -50,7 +50,9 @@ This is a debug utility. Some key items, unused items, and developer-facing defi
 
 ## Installation
 
-Install `Item_Giver_Mode_v0.1.0_Deltamod.zip` directly through Deltamod. Do not extract the archive into the game manually.
+Install the tested `Item_Giver_Mode_v0.1.0_Deltamod.zip` directly through Deltamod. Do not extract it into the game manually.
+
+The GitHub project mirrors the exact package contents under [`release/`](release/). When building from that folder, ZIP its contents so `meta.json` and `modding.xml` are at the archive root, then import the resulting ZIP into Deltamod.
 
 The package ID is `github.itemgivermode.gladiatorgaming`.
 
@@ -66,6 +68,6 @@ Mods that replace `scr_gamestart` outright or define another object named `obj_i
 
 ## Source and validation
 
-The release ZIP contains the distributable CSX source patches. No original DELTARUNE executable, `data.win`, music, or complete decompiled game source is included.
+The tested release ZIP and the mirrored `release/` folder contain the distributable CSX source patches. No original DELTARUNE executable, `data.win`, music, or complete decompiled game source is included.
 
 See [`tests/TEST_REPORT.md`](tests/TEST_REPORT.md) for validation details.

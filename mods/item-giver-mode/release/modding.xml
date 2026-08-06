@@ -1,0 +1,5 @@
+<patch type="csx" patch="./patches/ItemGiver_ch1.csx" to="./chapter1_windows/data.win" />
+<patch type="csx" patch="./patches/ItemGiver_ch2.csx" to="./chapter2_windows/data.win" />
+<patch type="csx" patch="./patches/ItemGiver_ch3.csx" to="./chapter3_windows/data.win" />
+<patch type="csx" patch="./patches/ItemGiver_ch4.csx" to="./chapter4_windows/data.win" />
+<patch type="csx" patch="./patches/ItemGiver_ch5.csx" to="./chapter5_windows/data.win" />
