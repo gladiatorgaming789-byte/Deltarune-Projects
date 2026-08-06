@@ -9,9 +9,9 @@ This folder contains completed **Deltamod-compatible merged builds** that combin
 Folder: [`deltarune-compatibility-merge/`](deltarune-compatibility-merge/README.md)
 
 - Current version: **1.0.7**
+- [Download the Deltamod ZIP](deltarune-compatibility-merge/release/DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip)
 - Combines Custom Difficulty, Better Saves, 60 FPS, Chapter 1 Modernized, No-Hat Ralsei, and New ACTs in the Knight Fight.
 - Includes package metadata, patch/output hashes, binary manifest, source-mod credits, complete changelog, and validation report.
-- The validated 14 MB Deltamod ZIP remains in the current workspace; the connected GitHub writer cannot transfer that binary directly, so the release is archived here as a complete project folder rather than an empty archive.
 
 ## Folder layout
 
@@ -23,6 +23,7 @@ merged mods/
     ├── docs/
     ├── package/
     └── release/
+        └── DELTARUNE_Compatibility_Merge_Deltamod_v1.0.7.zip
 ```
 
 ## Publishing standards
