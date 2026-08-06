@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Item Giver Mode's five Deltamod CSX scripts from the tested template."""
+"""Build Item Giver Mode v0.1.1's five Deltamod CSX scripts from the tested template."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -8,7 +8,7 @@ PATCH_DIR = ROOT / "patches"
 PATCH_DIR.mkdir(exist_ok=True)
 
 for chapter in range(1, 6):
-    text = TEMPLATE
+    text = TEMPLATE.replace("vk_f8", "vk_f7").replace("F8", "F7")
     if chapter != 1:
         text = text.replace("chapter 1", f"chapter {chapter}")
         text = text.replace("chapitre 1", f"chapitre {chapter}")
