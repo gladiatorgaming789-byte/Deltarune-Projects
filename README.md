@@ -42,7 +42,7 @@ All completed work is organized by project type. Installable builds must remain 
   - Current version: **0.1.0**
   - Combines Item Giver Mode v0.1.4 and Secret Boss Challenge v0.4.0 in one Deltamod package
   - Avoids relying on Deltamod/G3MTool cross-mod materialization for these two CSX mods
-  - Includes source CSX scripts in the release archive and a validation report
+  - Includes a reproducible package builder and validation report
 
 ## Branch guide
 
