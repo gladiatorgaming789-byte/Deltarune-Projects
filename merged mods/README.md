@@ -21,7 +21,7 @@ Folder: [`item-giver-secret-boss-challenge/`](item-giver-secret-boss-challenge/R
 - Combines Item Giver Mode v0.1.4 and Secret Boss Challenge v0.4.0.
 - Uses one Deltamod CSX per chapter so both source patches are materialized together rather than depending on cross-mod G3MTool merging.
 - Chapters 1, 2, and 5 include both mods; Chapters 3 and 4 include Item Giver because Secret Boss Challenge does not target those chapters.
-- Includes exact output hashes, idempotency checks, Debug Mode compatibility checks, and a validation report; the release ZIP contains the source CSX scripts.
+- Includes a reproducible [`package/`](item-giver-secret-boss-challenge/package/) builder, exact output hashes, idempotency checks, Debug Mode compatibility checks, and a validation report.
 
 ## Folder layout
 
@@ -37,8 +37,12 @@ merged mods/
 └── item-giver-secret-boss-challenge/
     ├── README.md
     ├── LICENSES.md
-    ├── release/
-    │   └── Item_Giver_Secret_Boss_Challenge_Merged_v0.1.0_Deltamod.zip
+    ├── package/
+    │   ├── build_release.py
+    │   ├── meta.json
+    │   ├── modding.xml
+    │   ├── README.txt
+    │   └── LICENSES.md
     └── tests/
 ```
 
