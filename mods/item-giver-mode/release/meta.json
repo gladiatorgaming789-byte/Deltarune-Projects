@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Item Giver Mode",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "color": {
       "r": 80,
       "g": 220,
       "b": 255
     },
-    "description": "Adds an F8 item browser that can grant any named item, weapon, armor, key item, or Light World item defined by Chapters 1-5.",
+    "description": "Adds an F7 item browser that can grant any named item, weapon, armor, key item, or Light World item defined by Chapters 1-5.",
     "author": [
       "GladiatorGaming"
     ],
