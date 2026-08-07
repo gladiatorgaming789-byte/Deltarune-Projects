@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build Secret Boss Challenge v0.4.1 as mergeable Deltamod .g3mpatch files.
+"""Build Secret Boss Challenge v0.4.2 as mergeable Deltamod .g3mpatch files.
 
-The gameplay source is extracted from the archived v0.4.0 Deltamod ZIP in the
-project folder, then materialized against clean chapter files before G3MTool
-creates the semantic merge patches.
+The v0.4.0 gameplay source is extracted from the archived release. Chapter 5
+then receives update_ch5_v042.csx before G3MTool creates the semantic patch.
+Chapters 1 and 2 remain gameplay-identical to v0.4.1.
 """
 from pathlib import Path
 import argparse
@@ -29,11 +29,14 @@ def main():
                    help='Folder containing chapter1_windows, chapter2_windows and chapter5_windows')
     p.add_argument('--utmt', type=Path, required=True, help='UndertaleModCli executable')
     p.add_argument('--g3mtool', type=Path, required=True, help='Deltamod-compatible G3MTool executable')
-    p.add_argument('--output', type=Path, default=ROOT / 'Secret_Boss_Challenge_v0.4.1_Deltamod.zip')
+    p.add_argument('--output', type=Path, default=ROOT / 'Secret_Boss_Challenge_v0.4.2_Deltamod.zip')
     args = p.parse_args()
 
     if not SOURCE_ZIP.exists():
         raise FileNotFoundError(f'Archived gameplay source not found: {SOURCE_ZIP}')
+    update_ch5 = ROOT / 'update_ch5_v042.csx'
+    if not update_ch5.exists():
+        raise FileNotFoundError(update_ch5)
 
     with tempfile.TemporaryDirectory(prefix='sbc_build_') as temp_name:
         temp = Path(temp_name)
@@ -45,8 +48,7 @@ def main():
         with zipfile.ZipFile(SOURCE_ZIP) as archive:
             for chapter in CHAPTERS:
                 member = f'patches/SecretBossChallenge_ch{chapter}.csx'
-                data = archive.read(member)
-                (source / f'SecretBossChallenge_ch{chapter}.csx').write_bytes(data)
+                (source / f'SecretBossChallenge_ch{chapter}.csx').write_bytes(archive.read(member))
 
         for name in ('meta.json', 'modding.xml', 'README.txt'):
             shutil.copy2(ROOT / name, stage / name)
@@ -55,11 +57,15 @@ def main():
         for chapter in CHAPTERS:
             clean = args.game_root / f'chapter{chapter}_windows' / 'data.win'
             modified = temp / f'ch{chapter}_modified.win'
-            csx = source / f'SecretBossChallenge_ch{chapter}.csx'
+            base_csx = source / f'SecretBossChallenge_ch{chapter}.csx'
             patch = patches / f'SecretBossChallenge_ch{chapter}.g3mpatch'
             if not clean.exists():
                 raise FileNotFoundError(clean)
-            run([args.utmt, 'load', clean, '--output', modified, '--scripts', csx])
+
+            scripts = [base_csx]
+            if chapter == 5:
+                scripts.append(update_ch5)
+            run([args.utmt, 'load', clean, '--output', modified, '--scripts', *scripts])
             run([args.g3mtool, 'patch', 'create', clean, modified, patch])
             run([args.g3mtool, 'patch', 'validate', patch, '--data', clean])
 
