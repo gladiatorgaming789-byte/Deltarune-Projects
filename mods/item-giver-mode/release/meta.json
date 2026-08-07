@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Item Giver Mode",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "color": {
       "r": 80,
       "g": 220,
       "b": 255
     },
-    "description": "Adds an F7 item browser with a clean late-rendered overlay for Chapters 1-5.",
+    "description": "Adds an F7 item browser using a minimal native G3M merge patch for broad mod compatibility.",
     "author": [
       "GladiatorGaming"
     ],
