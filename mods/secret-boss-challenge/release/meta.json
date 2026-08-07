@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "name": "Secret Boss Challenge",
+    "version": "0.4.1",
+    "color": {
+      "r": 255,
+      "g": 105,
+      "b": 180
+    },
+    "description": "Adds optional harder secret-boss modes, Pink rewards, Shield, and Pink Scarf graze bonuses using mergeable G3M patches.",
+    "author": [
+      "GladiatorGaming"
+    ],
+    "packageID": "github.secretbosschallenge.gladiatorgaming",
+    "game": "toby.deltarune",
+    "url": "https://github.com/gladiatorgaming789-byte/Deltarune-Projects",
+    "mergeSupport": true,
+    "tags": [
+      "gameplay",
+      "difficulty",
+      "bosses",
+      "items",
+      "spells"
+    ]
+  },
+  "deltaruneTargetVersion": "v23",
+  "neededFiles": [
+    {
+      "file": "chapter1_windows/data.win",
+      "checksum": "82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70"
+    },
+    {
+      "file": "chapter2_windows/data.win",
+      "checksum": "047c5ab003e3e017a709c02757e119c81e0327760169512110fd276b19241e68"
+    },
+    {
+      "file": "chapter5_windows/data.win",
+      "checksum": "370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c"
+    }
+  ]
+}
