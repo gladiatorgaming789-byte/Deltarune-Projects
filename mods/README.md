@@ -8,10 +8,11 @@ This folder contains completed **original standalone DELTARUNE mods**.
 
 Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
-- Current version: **0.4.1**
+- Current version: **0.4.2**
 - Chapters 1, 2, and 5
 - Optional secret-boss challenge behavior and enhanced rewards
-- Pink Scarf unlocks Shield and provides the graze passive
+- Pink Scarf unlocks a 75% TP whole-party Shield
+- Pink Scarf gives approximately +25% graze area and +10% graze TP gain
 - Distributed as Deltamod-native `g3mpatch` resources for improved multi-mod merging
 - Includes source, package metadata, license, and validation report
 
@@ -22,7 +23,7 @@ Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 - Current version: **0.2.0**
 - Chapters 1–5
 - F7 debug-style item browser
-- Items, weapons, armor, key items, and Light World items
+- Items, equipment, armor, key items, and Light World items
 - Runtime scan can see named item definitions from successfully merged mods
 - Distributed as Deltamod-native `g3mpatch` resources
 - Changes only `gml_Object_obj_time_Draw_75` in each chapter to minimize its merge footprint
@@ -30,7 +31,7 @@ Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 
 ### Item Giver + Secret Boss Challenge compatibility
 
-Use the **two standalone mods above**. Item Giver v0.2.0 and Secret Boss Challenge v0.4.1 were merged with Deltamod 2.0.4's bundled G3MTool in both orders across shared Chapters 1, 2, and 5 with zero G3M conflicts. The older dedicated combined package has been retired and removed.
+Use the **two standalone mods above**. Secret Boss Challenge v0.4.2 preserves the same Chapter 5 resource set as v0.4.1, and it still has zero direct resource-name overlap with Item Giver v0.2.0. The older dedicated combined package remains retired.
 
 ## Project layout
 
