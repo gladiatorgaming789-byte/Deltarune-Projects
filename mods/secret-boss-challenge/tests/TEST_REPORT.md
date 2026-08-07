@@ -1,107 +1,111 @@
-# Secret Boss Challenge — Test Report
+# Secret Boss Challenge v0.4.1 — Test Report
 
-## Environment
+## Scope
 
-- UndertaleModTool CLI 0.9.1.2 for Ubuntu
-- Wine 11.14 amd64-wow64
-- Deltamod-compatible CSX package structure
-- Debug Mode v4.01 Chapter 5 CSX patch
-- Supplied DELTARUNE Windows full-release files, launcher version `v23`
-- Chapter 1 source SHA-256: `82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70`
-- Chapter 2 source SHA-256: `047c5ab003e3e017a709c02757e119c81e0327760169512110fd276b19241e68`
-- Chapter 5 source SHA-256: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
+v0.4.1 changes the **Deltamod distribution format**, not Secret Boss Challenge gameplay. The gameplay source is the tested v0.4.0 implementation; v0.4.1 materializes that implementation and converts the changed resources to native `.g3mpatch` files.
 
-## Existing reward and difficulty checks
+## Why the format changed
 
-1. The Chapter 1 and Chapter 2 CSX scripts remain unchanged from v0.3.1.
-2. Chapter 5 still records Boss Challenge eligibility when Pink is defeated.
-3. Pink Scarf and the three Pink Coins require a Boss Challenge clear.
-4. Pink's Staff requires Boss Challenge plus Meaner Bombs.
-5. Challenge and non-challenge flower-shop purchase goals remain conditional.
-6. Inventory-full recovery and one-time reward states remain present.
+Deltamod 2.0.4 was inspected directly. Its patch pipeline merges xdelta/`g3mpatch` inputs first, then runs CSX patches afterward. Each CSX targeting a chapter is loaded from the chapter `.bak`, so multiple standalone CSX packages can replace one another instead of stacking.
 
-## Shield implementation
+Native `g3mpatch` is therefore the appropriate format for multi-mod resource merging.
 
-### Spell registration
+## Tools
 
-- Shield uses spell ID `14`, unused in the tested Chapter 5 build.
-- `scr_spellinfo` defines the name, descriptions, ally target type, and cost.
-- The internal cost is `162.5` out of the game's `250` maximum tension.
-- The battle UI calculates `floor((cost / maxtension) * 100)`, displaying **65% TP**.
-- `scr_spellmenu_setup` dynamically adds Shield to Ralsei's spell list only while weapon ID `38` is equipped.
-- The dynamic slot is removed when the scarf is no longer equipped, avoiding a permanently learned spell in the save data.
+- UndertaleModTool CLI 0.9.1.2 / Deltamod-bundled UTMT
+- **G3MTool 1.2.1 bundled with Deltamod 2.0.4**
+- Supplied DELTARUNE Windows full release, launcher target `v23`
 
-### Spell behavior
+## Clean source SHA-256
 
-- Casting Shield records the selected party slot as the protected target.
-- Recasting replaces the previous target.
-- A built-in battle effect is spawned on the chosen ally for cast feedback.
-- Both single-target and party-wide branches in `scr_damage` reduce protected-target damage to `ceil(damage * 0.25)`, with a minimum of 1.
-- The effect is initialized to inactive when a battle begins.
-- `scr_mnendturn` clears the effect when the party regains control after the enemy attack phase.
-- Shield therefore protects against all hits during that enemy phase rather than disappearing after the first hit.
+- Chapter 1: `82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70`
+- Chapter 2: `047c5ab003e3e017a709c02757e119c81e0327760169512110fd276b19241e68`
+- Chapter 5: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
-## Pink Scarf graze passive
+## Gameplay source outputs before G3M conversion
 
-- Weapon ID `38` remains Pink Scarf.
-- Item metadata reports `0.1` graze gain and `0.1` graze size.
-- The item ability string is `Shield / Graze +10%`.
-- `obj_grazebox` adds `0.1` to its TP factor and size factor when `scr_weaponcheck_equipped_party(38) > 0`.
-- Using the party-aware equipment check prevents the passive from remaining active when the wearer is absent from the active party.
+The unchanged v0.4.0 CSX source produced:
 
-## Compilation and round-trip checks
+- Chapter 1: `c282ec0e0aa11ad2cb3906de364bd6806112e677a2d2c00e2e6642f908411a78`
+- Chapter 2: `56a136dd92a081a78a2eec115ffaa993d82912fa271140571d33c7aeccb86334`
+- Chapter 5: `9e546af99d3cca4a9953c26ce87798c3b444a98356a826a77f7ff749b84a5174`
 
-1. Applied the v0.4.0 Chapter 5 CSX to the untouched Chapter 5 `data.win`.
-2. UndertaleModTool compiled and wrote the rebuilt file successfully.
-3. Reopened the rebuilt file and dumped every code entry changed by Shield or the passive.
-4. Confirmed the spell definition, dynamic menu insertion, cast behavior, battle text, both damage branches, turn expiry, battle reset, and graze factors.
-5. Applied the same Chapter 5 patch a second time.
-6. The second output was byte-identical to the first.
+## G3M patches
 
-Rebuilt Chapter 5 SHA-256:
+Patch SHA-256:
 
-`9e546af99d3cca4a9953c26ce87798c3b444a98356a826a77f7ff749b84a5174`
+- Chapter 1: `49527c84993260378bc1b45357bb1f010ef95c1d8d315486083c21beef13e722`
+- Chapter 2: `f68ec65bf763cf6f1f7c65b9c2d464ede8ca288e0bb00f60e000a41930bd8aca`
+- Chapter 5: `516dbcbc8459a2e757a1b512dc882f5c817a8235fd75e370290d5b22387fa7e7`
 
-## Debug Mode v4.01 compatibility
+Each patch passed `g3mtool patch validate --data <clean>`.
 
-Both Chapter 5 patch orders compiled successfully:
+Changed resource counts:
 
-1. Clean Chapter 5 → Debug Mode v4.01 → Secret Boss Challenge v0.4.0
-2. Clean Chapter 5 → Secret Boss Challenge v0.4.0 → Debug Mode v4.01
+- Chapter 1: 9 CodeEntries
+- Chapter 2: 8 CodeEntries
+- Chapter 5: 16 CodeEntries
+- No new or deleted resources in those patches
 
-Both outputs reopened and round-trip decompiled successfully. The following remained present in both orders:
+## Standalone G3M apply
 
-- Shield spell definition and 65% TP cost
-- dynamic Pink Scarf spell-menu gate
-- single-target and party-wide 75% reduction hooks
-- enemy-phase expiry and battle-start reset
-- party-aware +10% graze-size and TP-gain passive
-- Pink Scarf and Pink's Staff definitions
-- victory-time Boss Challenge reward gate
-- conditional flower-shop progression
-- Chapter 5 CONFIG toggle
+Using Deltamod 2.0.4's bundled G3MTool single-patch path, all three chapters applied successfully.
 
-## Startup smoke test
+Semantic-apply output SHA-256:
 
-The rebuilt Chapter 5 file was launched directly through the supplied DELTARUNE Windows runner under Wine and Xvfb. The process remained in the GameMaker main loop for the full 30-second test window and was then stopped by the test timeout. No immediate startup or data-load crash was emitted.
+- Chapter 1: `11a357a5504dc9a4843a29120394df8ecdb59f63dbd5c1315ae8bf275f173999`
+- Chapter 2: `dc8db75a8e7e772515a2e1fd03f5e82cc340cb07d12549d1d288e5b9c2aa043b`
+- Chapter 5: `8c977653e60eb78c2ab45365df56c38f5ca34f2301616b8840f814708eea9311`
 
-## Deltamod package validation
+Round-trip inspection retained the Boss Challenge CONFIG markers in Chapters 1 and 2 and Pink Scarf/Shield code in Chapter 5.
 
-- `meta.json` parses as valid JSON.
-- Nested `metadata.version` is `0.4.0`.
-- The package ID remains `github.secretbosschallenge.gladiatorgaming` for in-place updates.
-- `neededFiles` contains the verified Chapter 1, Chapter 2, and Chapter 5 checksums.
-- `modding.xml` contains three `type="csx"` entries.
-- Every referenced script exists at the declared archive path.
-- Required files are at the archive root.
-- ZIP central-directory and compressed-data integrity checks passed.
-- Applying the Chapter 5 script extracted from the final ZIP produced a byte-identical copy of the tested rebuilt file.
-- No original game executable, `data.win`, audio, or full decompiled source is included.
+## Separate-mod merge with Item Giver Mode v0.2.0
 
-Release ZIP SHA-256:
+Deltamod's actual G3M merge command style was tested in both orders for Chapters 1, 2, and 5:
 
-`1a35cb79430307e45fd1ff82db30f7a0b814d66927896beb0687c3e6ae3c83e1`
+1. Secret Boss Challenge → Item Giver
+2. Item Giver → Secret Boss Challenge
 
-## Not completed
+G3MTool results:
 
-A full manual battle playthrough covering every target, every multi-hit attack, every party-wide attack, Defend stacking, all inventory states, and every flower-selection order was not performed in the headless workspace. Those paths were validated through source inspection, successful compilation, round-trip decompilation, idempotency testing, package-output comparison, startup smoke testing, and cross-mod patch-order testing.
+- Chapter 1: `0 conflicts` in both orders
+- Chapter 2: `0 conflicts` in both orders
+- Chapter 5: `0 conflicts` in both orders
+
+Round-trip checks retained:
+
+- Boss Challenge markers in Chapters 1 and 2
+- Item Giver F7 code in all shared chapters
+- Pink Scarf in Chapter 5
+- Shield in Chapter 5
+
+No combined compatibility package is needed for these versions.
+
+## Preserved v0.4.0 gameplay validation
+
+Because the gameplay source is unchanged, the v0.4.0 checks remain applicable to the source material used to create v0.4.1, including:
+
+- Boss Challenge reward gates
+- Meaner Bombs + Boss Challenge Pink's Staff requirement
+- Pink Scarf / Pink's Staff definitions and character restrictions
+- 65% TP Shield spell registration and Ralsei equipment gate
+- approximately 75% Shield damage reduction through the next enemy phase
+- battle reset / end-turn expiry
+- party-aware approximately +10% graze size and TP gain
+- full-inventory pending recovery
+- Chapter 5 CONFIG and conditional flower-shop progression
+
+The v0.4.0 Chapter 5 source also previously completed a 30-second Wine startup smoke test without an immediate data-load crash.
+
+## Final Deltamod ZIP
+
+- Package ID: `github.secretbosschallenge.gladiatorgaming`
+- Version: `0.4.1`
+- Three `type="g3mpatch"` routes: Chapters 1, 2, and 5
+- ZIP integrity: passed
+- Packaged patch files: byte-identical to the patches used in validation and two-mod merge testing
+- ZIP SHA-256: `cdaf7546bd78013dcb26264f91e71499454c7cb4600a016fe76aea252438709e`
+
+## Limitations
+
+A full interactive playthrough of every secret-boss route, Pink reward state, Shield target/hit combination, and inventory state was not repeated for the packaging-only v0.4.1 update. Also, third-party CSX packages targeting the same chapter can still replace G3M output because of Deltamod 2.0.4's CSX stage behavior.
