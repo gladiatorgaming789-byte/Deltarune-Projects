@@ -1,21 +1,24 @@
 # Item Giver Mode
 
-**Version:** 0.1.4  
+**Version:** 0.2.0  
 **Target:** DELTARUNE Windows full release, launcher version `v23`  
 **Chapters:** 1–5  
-**Installer:** Deltamod-compatible UTMT `.csx` patches
+**Installer:** Deltamod native `.g3mpatch` patches
 
-Item Giver Mode adds a standalone debug-style inventory browser. Press **F7** outside battle to browse and grant named items defined by the current chapter.
+Item Giver Mode is a standalone debug-style inventory browser. Load a save and press **F7** outside battle to browse and grant named definitions from the current chapter.
 
-## Version 0.1.4
+## Version 0.2.0
 
-- Fixed DELTARUNE's own inventory/menu text drawing over the Item Giver overlay.
-- Moved the renderer from the normal Draw GUI pass to **Draw GUI End** on the native persistent `obj_time` controller.
-- Added a full-screen dim layer and opaque centered panel.
-- The panel now uses `display_get_gui_width()` and `display_get_gui_height()` instead of fixed screen placement.
-- Item names replace `#` line-break markers with spaces and long list names are shortened.
-- Preview, status, and toast text use wrapped drawing so they stay inside the interface.
-- F7 remains the open/close hotkey.
+v0.2.0 is a compatibility-focused rewrite. The user-facing menu is retained, but the patch footprint and Deltamod format changed substantially:
+
+- Distribution changed from `type="csx"` to native `type="g3mpatch"`.
+- Each chapter changes **one existing code entry only**: `gml_Object_obj_time_Draw_75`.
+- No new GameMaker object is created.
+- No new Step, Cleanup, or helper-script resources are added.
+- F7 input, lazy initialization, item scanning, granting, and the late GUI renderer all live in DELTARUNE's existing persistent `obj_time` Draw GUI End event.
+- The menu still reads the final in-game item tables at runtime, allowing named definitions added by successfully merged mods to appear.
+
+This minimizes Item Giver's resource collision surface and lets Deltamod/G3MTool merge it with other native merge patches instead of one CSX-built `data.win` replacing another.
 
 ## Categories
 
@@ -38,27 +41,43 @@ Item Giver Mode adds a standalone debug-style inventory browser. Press **F7** ou
 | R | Refresh item definitions |
 | X / Escape | Close |
 
-## Save warning
+## Inventory behavior
 
-Some key items and unused/developer items depend on plot flags or scripted acquisition sequences. Giving an item does not automatically set every story flag associated with earning it. Back up the save before experimenting with progression-sensitive entries.
+Item Giver uses DELTARUNE's native grant functions for each inventory type. It does not silently overwrite equipped gear or simulate every plot event normally associated with earning progression-sensitive items.
 
 ## Compatibility
 
-- Deltamod CSX patches for Chapters 1–5.
-- Debug Mode v4.01 compiles successfully before and after Item Giver Mode in all five chapters.
-- **Secret Boss Challenge:** do not rely on enabling the standalone Item Giver and standalone Secret Boss Challenge packages together. Deltamod's cross-mod merge path does not reproduce the sequential UTMT test used during early compatibility checks. Use the dedicated [`Item Giver + Secret Boss Challenge`](../../merged%20mods/item-giver-secret-boss-challenge/README.md) merged package instead.
-- Applying Item Giver Mode v0.1.4 twice produces byte-identical output in all five chapters.
+### Secret Boss Challenge
+
+**Item Giver Mode v0.2.0 and Secret Boss Challenge v0.4.1 are separate mods and can be enabled together.**
+
+Their packaged patch resources were tested with the **G3MTool 1.2.1 binary bundled inside Deltamod 2.0.4** using the same command style Deltamod uses for multi-mod merging. Chapters 1, 2, and 5 were merged in both mod orders with:
+
+- **0 G3M conflicts**
+- Item Giver's F7 code retained
+- Secret Boss Challenge retained
+- Pink Scarf and Shield retained in Chapter 5
+
+No dedicated Item Giver + Secret Boss Challenge merged package is required.
+
+### Other mods
+
+The v0.2.0 patch contains one changed CodeEntry and no new/deleted resources, which is intentionally small. It should merge cleanly with mods that do not conflict with `obj_time`'s Draw GUI End code, and G3MTool can resource-merge many independent changes.
+
+Compatibility cannot be guaranteed with every mod. In particular, **Deltamod 2.0.4 runs CSX patches after its G3M merge stage and rebuilds each CSX from the chapter backup**. A third-party mod still distributed as CSX for the same `data.win` can therefore replace previously merged G3M output even when the mods edit unrelated resources. That is an installer-level limitation rather than an Item Giver resource conflict.
+
+For best multi-mod compatibility, use native `g3mpatch`/xdelta releases when available.
 
 ## Installation
 
-Install `Item_Giver_Mode_v0.1.4_Deltamod.zip` directly through Deltamod when using Item Giver by itself.
+Install `Item_Giver_Mode_v0.2.0_Deltamod.zip` directly through Deltamod. The package ID remains `github.itemgivermode.gladiatorgaming`, so it updates earlier Item Giver releases in place.
 
-If Secret Boss Challenge is also wanted, install the dedicated merged package instead and disable/remove both standalone copies.
+The release source under [`release/`](release/) documents how the `.g3mpatch` files are generated from clean chapter files using UndertaleModCli and G3MTool.
 
-The GitHub project mirrors the tested package source under [`release/`](release/). Run `build_release.py` there to generate the five chapter scripts, then ZIP the release-folder contents so `meta.json` and `modding.xml` are at the archive root.
+**Release SHA-256:** `c42703ffa546a74bd0c02c4112e849edcaeb8330001a42f83684efb2b20772f5`
 
-Package ID: `github.itemgivermode.gladiatorgaming`
+## Save warning
 
-Release SHA-256: `08828b77f881be8ba5093e73c56893f8161f6813fe96bd699eed9697c5bf0f30`
+Some key items and unused/developer definitions depend on plot flags or scripted acquisition sequences. Giving an item does **not** automatically set every flag normally associated with earning it. Back up progression-sensitive saves before experimenting.
 
 See [`tests/TEST_REPORT.md`](tests/TEST_REPORT.md) for validation details.
