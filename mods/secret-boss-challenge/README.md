@@ -1,20 +1,22 @@
 # Secret Boss Challenge
 
-**Version:** 0.4.1  
+**Version:** 0.4.2  
 **Target:** DELTARUNE full release, launcher version `v23`  
 **Chapters:** 1, 2, and 5  
 **Installer:** Deltamod native `.g3mpatch` patches
 
 Secret Boss Challenge adds a persistent **Boss Challenge: OFF/ON** setting, harder secret-boss variants, and enhanced challenge rewards.
 
-## Version 0.4.1
+## Version 0.4.2
 
-v0.4.1 is a **compatibility/packaging update**. Gameplay is unchanged from v0.4.0.
+v0.4.2 updates **Pink Scarf** and **Shield** while preserving the standalone mergeable `g3mpatch` distribution introduced in v0.4.1.
 
-- Distribution changed from Deltamod CSX installation patches to native `g3mpatch` files.
-- This lets Deltamod/G3MTool resource-merge the mod with other merge-aware packages instead of one CSX-built `data.win` replacing another.
-- The package ID is unchanged, so v0.4.1 updates earlier Secret Boss Challenge installations in place.
-- Item Giver Mode v0.2.0 can now remain a **separate enabled mod**; no dedicated combined package is required.
+- Pink Scarf graze-area bonus: **+10% → +25%**.
+- Pink Scarf graze TP gain remains **+10%**.
+- Shield now protects the **entire active party** instead of one selected ally.
+- Shield cost: **65% TP → 75% TP**.
+- Shield still reduces incoming damage by approximately **75%** for the next enemy attack phase.
+- Package ID is unchanged, so v0.4.2 updates prior installations in place.
 
 ## Features
 
@@ -42,13 +44,13 @@ Boss Challenge is available in Chapter 5 CONFIG.
 
 **Boss Challenge ON** grants after defeating Pink:
 
-- **Pink Scarf** — Ralsei weapon, **8 AT / 4 DF / 12 MAG**
+- **Pink Scarf** — Ralsei equipment, **8 AT / 4 DF / 12 MAG**
 - **3 additional Pink Coins**
 - A fourth regular flower-shop purchase
 
 **Boss Challenge ON + Meaner Bombs** also grants:
 
-- **Pink's Staff** — Kris weapon, **14 AT / 2 DF / 4 MAG**
+- **Pink's Staff** — Kris equipment, **14 AT / 2 DF / 4 MAG**
 
 Eligibility is recorded when Pink is defeated. Turning Boss Challenge on afterward does not qualify an earlier clear.
 
@@ -56,23 +58,23 @@ Eligibility is recorded when Pink is defeated. Turning Boss Challenge on afterwa
 
 Equipping Pink Scarf on Ralsei unlocks **Shield**:
 
-- Cost: **65% TP**
-- Target: one party member
+- Cost: **75% TP**
+- Targeting: no ally-selection step; the spell protects the **whole active party**
 - Damage reduction: approximately **75%**
-- Duration: next enemy attack phase
-- Recasting replaces the previous protected target
+- Duration: the next enemy attack phase
 - Covers repeated direct hits and party-wide damage during that phase
+- Shield clears when the party regains control
 
 Pink Scarf also gives approximately:
 
-- **10% larger graze area**
+- **25% larger graze area**
 - **10% more TP from grazing**
 
 ## Save migration and inventory recovery
 
-- Weapon ID `38`: Pink Scarf
-- Weapon ID `39`: Pink's Staff
-- Spell ID `14`: Shield
+- Pink Scarf remains item ID `38`.
+- Pink's Staff remains item ID `39`.
+- Shield remains spell ID `14`.
 - Eligible equipment that cannot fit remains pending and can be retried by the flower shop.
 - Pink Scarf, Pink's Staff, and bonus Pink Coins retain separate one-time reward states.
 - Rewards already received from older releases are not removed.
@@ -81,22 +83,22 @@ Pink Scarf also gives approximately:
 
 ### Item Giver Mode
 
-**Secret Boss Challenge v0.4.1 and Item Giver Mode v0.2.0 are separate Deltamod mods and were tested together.**
+Secret Boss Challenge v0.4.2 and Item Giver Mode v0.2.0 remain **separate Deltamod mods**.
 
-Using the **G3MTool 1.2.1 binary bundled with Deltamod 2.0.4**, shared Chapters 1, 2, and 5 were merged in both mod orders with **0 G3M conflicts**. Round-trip checks retained both mods, including Pink Scarf and Shield in Chapter 5.
+Item Giver changes only `gml_Object_obj_time_Draw_75` in Chapter 5. Secret Boss Challenge v0.4.2 still changes the same 16 Chapter 5 resources as v0.4.1, none of which overlap that Item Giver resource. The v0.4.1 G3M releases were previously merged with Deltamod 2.0.4's bundled G3MTool in both orders with zero conflicts; v0.4.2 keeps that resource separation.
 
 ### Other mods
 
-v0.4.1 is substantially more merge-friendly than the CSX-distributed release because Deltamod can resource-merge it with other `g3mpatch`/xdelta packages.
+The native `g3mpatch` format lets Deltamod/G3MTool resource-merge Secret Boss Challenge with other merge-aware packages. Compatibility is not universal: mods editing the same CONFIG, Pink reward, spell, damage, graze, or flower-shop code may require conflict resolution.
 
-Compatibility is not universal. Deltamod 2.0.4 runs third-party CSX patches after the G3M merge stage, and a CSX targeting the same chapter can overwrite previously merged output. Mods editing the same boss/config/spell/damage/graze/shop code can also produce genuine semantic conflicts.
+Deltamod 2.0.4 also runs third-party CSX patches after its G3M merge stage, so a CSX targeting the same chapter can overwrite previously merged output.
 
 ## Installation
 
-Install `Secret_Boss_Challenge_v0.4.1_Deltamod.zip` directly through Deltamod. Do **not** install the retired Item Giver + Secret Boss Challenge combined package; use the two current standalone packages instead.
+Install `Secret_Boss_Challenge_v0.4.2_Deltamod.zip` directly through Deltamod.
 
-**Release SHA-256:** `cdaf7546bd78013dcb26264f91e71499454c7cb4600a016fe76aea252438709e`
+**Release SHA-256:** `0771618faa283cf1caa2fa7e34be5601f5d960036a8b52d8946fdc73a55fc35f`
 
-The reproducible source under [`release/`](release/) retains the v0.4.0 gameplay CSX as source and converts its clean modified results to native `g3mpatch` files.
+The reproducible source under [`release/`](release/) extracts the archived v0.4.0 gameplay source, applies [`update_ch5_v042.csx`](release/update_ch5_v042.csx) to Chapter 5, and converts the results to native `g3mpatch` files.
 
 See [`tests/TEST_REPORT.md`](tests/TEST_REPORT.md) for validation details.
