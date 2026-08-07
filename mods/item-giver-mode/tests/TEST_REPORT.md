@@ -1,62 +1,101 @@
-# Item Giver Mode v0.1.4 — Test Report
+# Item Giver Mode v0.2.0 — Test Report
 
-## User-reported issue
+## Goal
 
-The v0.1.3 menu opened, but DELTARUNE's own inventory/menu text could render over the Item Giver and stale-looking text remained around the lower/left areas of the screen.
+Make Item Giver a separate Deltamod mod that can coexist with Secret Boss Challenge and as many other mods as Deltamod's merge system permits.
 
-## Root cause
+## Root cause of the previous compatibility problem
 
-v0.1.3 appended Item Giver to `obj_time`'s normal Draw GUI event (subtype 64). Other GUI objects can render later in the frame, so their text appeared on top of the Item Giver. The renderer also assumed a fixed 640×480-style layout and drew raw item names that can contain `#` line-break markers.
+Inspection of Deltamod 2.0.4's installed `GamePatching.js` showed this pipeline:
 
-## Fix
+1. override/copy patches
+2. xdelta + `g3mpatch` merge stage
+3. CSX stage
 
-v0.1.4:
+For every CSX targeting a chapter `data.win`, Deltamod 2.0.4 loads the same `.bak` source and writes that script's result to the live target. Multiple standalone CSX mods therefore do not reliably stack; a later CSX can replace earlier changes. Sequential UndertaleModTool testing was not an exact simulation of this pipeline.
 
-- Moves Item Giver rendering to `obj_time` Draw GUI End (subtype 75).
-- Draws a full-screen dim layer before the centered panel.
-- Uses `display_get_gui_width()` / `display_get_gui_height()` for placement.
-- Sanitizes `#` markers from list names.
-- Truncates long list/preview names.
-- Uses `draw_text_ext` for wrapped description, status, and toast text.
+## Compatibility rewrite
 
-## Compilation
+v0.2.0 is distributed as native `.g3mpatch` files generated with **Deltamod 2.0.4's bundled G3MTool 1.2.1**.
 
-All five clean chapter files compiled and wrote successfully.
+The Item Giver implementation was also reduced to one changed resource per chapter:
 
-Rebuilt SHA-256 values:
+- Resource type: `CodeEntries`
+- Changed resources: **1**
+- New resources: **0**
+- Deleted resources: **0**
+- Entry: `gml_Object_obj_time_Draw_75`
 
-- Chapter 1: `cfe9494854ef30ff759a877972d389a5803c8836221f1a5a2d3b22da77f77be0`
-- Chapter 2: `2d99dd288df1495bb04c9a726b359401b3dc3b71412b30b57f30511643683f49`
-- Chapter 3: `b6c1297c9622d2e18ce9ee335730c7c8cc568f6aaa4991608f36d6799dc64b3b`
-- Chapter 4: `6566ff0357bd01ccc9ce790430fc739694a632b3c95cc8fe1825d4c93bd82167`
-- Chapter 5: `2a4df04a91702660feb33e80a37466f63ace6fefe4a8ff9b8ab58ee864650fb4`
+No custom GameMaker object, new event, or helper Script resource is required.
 
-Chapter 1 round-trip decompilation confirms the Item Giver renderer is present in `gml_Object_obj_time_Draw_75`.
+## Clean source SHA-256
 
-## Idempotency
+- Chapter 1: `82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70`
+- Chapter 2: `047c5ab003e3e017a709c02757e119c81e0327760169512110fd276b19241e68`
+- Chapter 3: `c1a0925343694ec9b9adcbf2f916a720b02fd1b999286cfe8fe6a52f3320f714`
+- Chapter 4: `ed64789586238b52375e994e1c1cf13694dd2d0dab57d13e639b9c892e37d8f2`
+- Chapter 5: `370dfd141d2955d5a1960122919b16e4092b52ffbb85fda541bc4680c6b3b85c`
 
-Applying the matching v0.1.4 patch a second time produced byte-identical output in Chapters 1–5.
+## Patch SHA-256
 
-## Debug Mode v4.01 compatibility
+- Chapter 1: `b9d944d2d8ea70b3cc622a8b409f98a979ff26c50c3c651aa1897bf109659e82`
+- Chapter 2: `9a1bccb064ec276626e6e3ba74603bbafd4e13a2767f5c981cdf5bef2e0cb3b6`
+- Chapter 3: `652412922dad71dec4730be9e63143cd89aea39c4d384143b831ffdf4479028e`
+- Chapter 4: `11c37b1a56b659578ec3416b9c2ca183ea7347b6911fae3964f9cb91a8cbca6a`
+- Chapter 5: `91bcae445bc2c40f8591ff4b8ef30702ccc36ede6d211712088eefd8f4611c3d`
 
-Both patch orders compiled successfully across Chapters 1–5:
+Each packaged patch passed `g3mtool patch validate ... --data <clean chapter>` and reported one changed resource.
 
-1. Debug Mode → Item Giver Mode
-2. Item Giver Mode → Debug Mode
+## Standalone apply path
 
-## Secret Boss Challenge v0.4.0 compatibility
+The exact G3MTool bundled with Deltamod 2.0.4 was used with the same single-patch operation Deltamod uses:
 
-Both patch orders compiled successfully in Chapter 5.
+`g3mtool patch apply <clean> <ItemGiver.g3mpatch> <output>`
 
-## Package validation
+All Chapters 1–5 applied successfully. Each output was reopened with UndertaleModCli and `gml_Object_obj_time_Draw_75` was decompiled. Every chapter retained:
 
-- `meta.json` parses successfully and reports version `0.1.4`.
-- Package ID remains `github.itemgivermode.gladiatorgaming`.
-- `modding.xml` still routes all five chapters through Deltamod CSX patches.
-- ZIP integrity test passed.
-- Every chapter script extracted from the final ZIP reproduced the tested chapter output byte-for-byte.
-- ZIP SHA-256: `08828b77f881be8ba5093e73c56893f8161f6813fe96bd699eed9697c5bf0f30`.
+- `ig_itemgiver_version`
+- `vk_f7`
+- `ITEM GIVER`
 
-## Manual verification still needed
+Semantic-apply output SHA-256:
 
-The exact visual overlap was reported from a real Windows gameplay session. The renderer architecture causing it has been changed and compile/round-trip checks pass, but the final visual result still needs confirmation in the user's normal Deltamod/Windows setup.
+- Chapter 1: `e053dff848719d2bb003de19558e7825c658c018794d80490a81c3b862c8367a`
+- Chapter 2: `d42996e44bdf92e8de80fe5b98972b4443373a56d0bcd7b5d8d55efb9dde962e`
+- Chapter 3: `98d6d390e3a5ca98defc0e7455acb6c870582d653b46d906e94d4cbe591604cd`
+- Chapter 4: `5cfcf951f07bfa32888ccf9822b3def593e6768aebcbba009fe0d81378c4208b`
+- Chapter 5: `82ce961a5aec31a40fb2743f97f5033bbbaaad18f56a942f2c567d27ab2c4f86`
+
+## Separate-mod merge with Secret Boss Challenge v0.4.1
+
+The exact Deltamod 2.0.4 G3MTool merge path was tested for shared Chapters 1, 2, and 5 in both orders:
+
+1. Item Giver → Secret Boss Challenge
+2. Secret Boss Challenge → Item Giver
+
+Results:
+
+- Chapter 1: **0 conflicts** in both orders
+- Chapter 2: **0 conflicts** in both orders
+- Chapter 5: **0 conflicts** in both orders
+
+The G3MTool logs reported one auto-merged helper/asset-order item in each run and no code conflict. Round-trip decompilation retained the Item Giver F7 handler plus Secret Boss Challenge markers in Chapters 1/2, and retained F7, Pink Scarf, and Shield together in Chapter 5.
+
+The two order outputs are not asserted to be byte-identical; both were independently reopened and feature-checked.
+
+## Final Deltamod ZIP
+
+- Package ID: `github.itemgivermode.gladiatorgaming`
+- Version: `0.2.0`
+- `modding.xml`: five `type="g3mpatch"` routes
+- ZIP integrity: passed
+- Extracted `.g3mpatch` files: byte-identical to the patches used in validation/merge tests
+- ZIP SHA-256: `c42703ffa546a74bd0c02c4112e849edcaeb8330001a42f83684efb2b20772f5`
+
+## Important limitation
+
+Deltamod 2.0.4's later CSX stage can still replace a G3M-merged `data.win`. A separate third-party CSX package targeting the same chapter can therefore remain incompatible even if it edits unrelated code. This cannot be solved solely by reducing Item Giver's G3M resource footprint.
+
+## Manual verification
+
+The previous v0.1.x F7 menu and GUI were confirmed by the user in-game. v0.2.0 moves input handling into the existing Draw GUI End entry to eliminate extra resources. Compilation, semantic application, decompilation, and G3M merge tests pass, but a fresh manual F7 keypress on v0.2.0 still needs confirmation in the user's normal Windows/Deltamod setup.
