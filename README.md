@@ -17,16 +17,16 @@ All completed work is organized by project type. Installable builds must remain 
 ### Standalone mods
 
 - [Secret Boss Challenge](mods/secret-boss-challenge/README.md)
-  - Current version: **0.4.1**
+  - Current version: **0.4.2**
   - Native Deltamod `g3mpatch` release source for Chapters 1, 2, and 5
-  - Boss Challenge, Pink rewards, Pink Scarf Shield spell, and graze passive
+  - Boss Challenge, Pink rewards, whole-party Shield, +25% graze area, and +10% graze TP gain
 - [Item Giver Mode](mods/item-giver-mode/README.md)
   - Current version: **0.2.0**
   - Native Deltamod `g3mpatch` release source for Chapters 1–5
-  - F7 item browser with Items, Weapons, Armor, Key Items, and Light World items
+  - F7 item browser with consumables, equipment, armor, key items, and Light World items
   - One changed existing CodeEntry per chapter to minimize merge conflicts
 
-Item Giver Mode v0.2.0 and Secret Boss Challenge v0.4.1 are **separate mods** and were validated together with the G3MTool 1.2.1 binary bundled in Deltamod 2.0.4. Their shared chapters merged in both orders with zero G3M conflicts.
+Item Giver Mode v0.2.0 and Secret Boss Challenge v0.4.2 remain **separate mods**. Their Chapter 5 G3M resource sets have no direct resource-name overlap.
 
 ### Merged mods
 
