@@ -1,0 +1,3 @@
+<patch type="g3mpatch" patch="./patches/SecretBossChallenge_ch1.g3mpatch" to="./chapter1_windows/data.win" />
+<patch type="g3mpatch" patch="./patches/SecretBossChallenge_ch2.g3mpatch" to="./chapter2_windows/data.win" />
+<patch type="g3mpatch" patch="./patches/SecretBossChallenge_ch5.g3mpatch" to="./chapter5_windows/data.win" />
