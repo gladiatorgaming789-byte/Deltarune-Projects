@@ -8,15 +8,14 @@ This folder contains completed **original standalone DELTARUNE mods**.
 
 Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
-- Base version: **0.4.2**
-- Current runtime fix: **Shield Hotfix 0.4.2-hf1** (companion package)
+- Current version: **0.4.3**
 - Chapters 1, 2, and 5
 - Optional secret-boss challenge behavior and enhanced rewards
 - Pink Scarf unlocks a 75% TP whole-party Shield
 - Pink Scarf gives approximately +25% graze area and +10% graze TP gain
-- v0.4.2 has a confirmed Shield-cast `scr_spell` local-variable crash; hf1 bypasses only Shield through a unique helper
-- Base mod and hotfix are Deltamod-native `g3mpatch` packages
-- Includes source and validation records for the hotfix
+- v0.4.3 integrates the Shield crash fix directly into the main mod; no companion hotfix is needed
+- Shield casting is isolated from `scr_spell` in `scr_gg_sbc_shield_apply`
+- Distributed as Deltamod-native `g3mpatch` resources
 
 ### Item Giver Mode
 
@@ -30,14 +29,12 @@ Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 - Runtime scan can see named item definitions from successfully merged mods
 - Distributed as Deltamod-native `g3mpatch` resources
 - Real Controls logic lives in `obj_darkcontroller`; the heavy runtime is isolated in `scr_gg_itemgiver_runtime`
-- `obj_time` receives only one helper call, avoiding the local-heavy v0.3.0 design
-- Includes source, package metadata, license, and validation report
 
 ### Item Giver + Secret Boss Challenge compatibility
 
-Keep the projects separate. The obsolete dedicated combined package remains retired.
+Keep the projects as two standalone mods. The obsolete dedicated combined package remains retired.
 
-Item Giver v0.3.1 and the SBC Shield hf1 G3M patch were merged with G3MTool 1.2.1 in **both orders with 0 conflicts**. The remaining real-Windows regression is to run Item Giver v0.3.1 + SBC v0.4.2 + hf1 together and cast Shield.
+Item Giver v0.3.1 and Secret Boss Challenge v0.4.3 were merged with **G3MTool 1.2.1 in both orders for Chapters 1, 2, and 5**. All six tests completed with **0 conflicts**.
 
 ## Project layout
 
