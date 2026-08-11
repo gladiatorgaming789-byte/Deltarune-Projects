@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Item Giver Mode",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "color": {
       "r": 80,
       "g": 220,
       "b": 255
     },
-    "description": "Adds an item browser with a rebindable Controls-menu hotkey (default I) using a minimal native G3M merge patch.",
+    "description": "Adds an item browser with a real rebindable DELTARUNE Controls-menu hotkey (default I) using native G3M merge patches.",
     "author": [
       "GladiatorGaming"
     ],
