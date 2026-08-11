@@ -1,98 +1,127 @@
-# Item Giver Mode v0.3.0 — Test Report
+# Item Giver Mode v0.3.1 — Test Report
 
-## Scope
+## Why v0.3.1 exists
 
-v0.3.0 replaces the fixed F7 shortcut with a rebindable keyboard control while preserving Item Giver's one-CodeEntry-per-chapter G3M footprint.
+The real Windows test of v0.3.0 exposed two failures that static source checks had missed:
 
-Implemented behavior:
+1. The pseudo **ITEM GIVER** Controls row did not appear/work as a real selectable Controls entry and pressing the documented default `I` did nothing.
+2. Enabling Item Giver together with Secret Boss Challenge could crash in `gml_Object_obj_time_Draw_75` with `local variable bbox_top(24) not set before reading it`.
 
-- Default binding: **I** (`73`).
-- Item Giver is exposed as an **ITEM GIVER** row at the bottom of DELTARUNE's Controls menu.
-- Confirming that row enters keyboard rebind mode.
-- Escape cancels the rebind.
-- Keys already used by DELTARUNE's seven normal keyboard actions are rejected.
-- Binding is stored per save slot in `keyconfig_<slot>.ini`, section `ITEM_GIVER`, key `KEYBOARD`.
-- DELTARUNE's **Reset to default** action also resets Item Giver to I.
-- The Item Giver footer shows the currently configured key.
+The v0.3.0 test process compiled and decompiled the pseudo-row source but never performed the required interactive Controls test. v0.3.1 replaces that architecture rather than trying to patch around it.
 
-## Compatibility architecture
+## v0.3.1 architecture
 
-The implementation remains entirely inside:
+Per chapter, the final G3M patch contains exactly:
 
-`gml_Object_obj_time_Draw_75`
+### Changed CodeEntries
 
-for every chapter.
+- `gml_Object_obj_darkcontroller_Step_0`
+- `gml_Object_obj_darkcontroller_Draw_0`
+- `gml_Object_obj_time_Draw_75`
 
-The Controls row is a late-drawn pseudo-row using the existing Controls cursor state rather than a modification to `obj_darkcontroller`. This was chosen specifically to avoid increasing Item Giver's resource collision surface.
+### New resources
 
-Each packaged patch reports:
+- Script `scr_gg_itemgiver_runtime`
+- CodeEntry `gml_Script_scr_gg_itemgiver_runtime`
 
-- Changed CodeEntries: **1**
-- New resources: **0**
-- Deleted resources: **0**
-- Changed entry: `gml_Object_obj_time_Draw_75`
+### Important obj_time invariant
 
-The helper files in the v0.3.0 G3M patches are byte-identical to their v0.2.0 equivalents because the asset/resource layout is unchanged.
+`gml_Object_obj_time_Draw_75` contains one Item Giver call:
 
-## Clean compilation
+```gml
+scr_gg_itemgiver_runtime();
+```
 
-The v0.3.0 one-CodeEntry source compiled successfully with UndertaleModTool in Chapters 1–5.
+and no Item Giver local-variable declarations. The menu, inventory logic, persistence, and drawing code live in the uniquely named helper script.
 
-Source-build SHA-256:
+## Clean compilation and round-trip verification
 
-- Chapter 1: `4992bf034590697effbc53aeea55f36a1a53e894a525c1ae531287e8337278ef`
-- Chapter 2: `185618028c7c28bfaafccf1606002edc7e0256d557cf26d4616da417119d3c00`
-- Chapter 3: `0ad564b085102c61f0783b53202b827ca31f2b76c179e60c4cd6064894df1e1c`
-- Chapter 4: `7c45c32d0fdbd78d2025284024ef80294b7f9a6cda4c99b2af7434e9647a3053`
-- Chapter 5: `4891ec2f104369e2474e194dbaffa368990cfb9fd93eb794a4411eb9421aea9b`
+UndertaleModTool CLI 0.9.1.2 compiled the v0.3.1 source successfully for Chapters 1–5.
 
-Round-trip decompilation of every chapter confirmed:
+The outputs were independently reopened/decompiled. Every chapter confirmed:
 
-- default key value `73` / I
-- `ITEM_GIVER` + `KEYBOARD` INI read/write logic
-- Controls pseudo-row index 9
-- `keyboard_lastkey` rebind logic
-- `PRESS A KEY` feedback
-- current-binding input check
-- no remaining F7 handler/reference
+- exactly one `scr_gg_itemgiver_runtime()` call in `obj_time` Draw GUI End;
+- no Item Giver local variables in that event;
+- real Controls navigation permits row 9 on non-console builds;
+- custom keyboard rebind state `3` is present;
+- the Controls Draw event contains `ITEM GIVER`;
+- default Item Giver key is `73` / `I`;
+- runtime version is `0.3.1`.
 
-## Packaged G3M patches
+## G3MTool 1.2.1 validation
 
-SHA-256:
+G3MTool 1.2.1 was used to create, validate, and apply the patches.
 
-- Chapter 1: `627d5e093e73a60f69823dea3095142053d93899564abdabb8dca0fe067011a1`
-- Chapter 2: `b6e8bfe8a689a8fe3641ba242e79c76353491c2871f45f6bab65a3c3f669e01f`
-- Chapter 3: `d4dc2e79b1739a66472a9f41923e923066957db54b15a8fa90157f1c07634109`
-- Chapter 4: `52eaea510cd11e643966fc47de75f43fd503c2a72a08c69e5786c1e75c5fbda8`
-- Chapter 5: `170fcc2b426339cdb322d706aee9a5a977adc12331ee7c88209fa03c3995a7f8`
+UTMT serialization caused G3MTool to initially report unrelated Sound resources as changed. Item Giver does not edit audio. The release pipeline now removes those Sound-only serialization diffs and rejects any other unexpected resource type/name.
 
-Nested G3M ZIP integrity checks passed for all five patches. Their manifests retain the clean chapter identities and the one-changed-CodeEntry resource plan.
+Final patch resource plan for **every chapter**:
 
-## Secret Boss Challenge v0.4.2 compatibility
+- changed CodeEntries: **3**;
+- new CodeEntries: **1**;
+- new Scripts: **1**;
+- deleted resources: **0**;
+- Sound resources: **0**.
 
-The packaged Chapter 5 manifests were compared directly.
+All five cleaned patches validated with G3MTool 1.2.1, applied to their clean chapter `data.win`, and the applied outputs were reopened/decompiled with the expected v0.3.1 markers intact.
 
-- Item Giver v0.3.0 changes: `gml_Object_obj_time_Draw_75`
-- Secret Boss Challenge v0.4.2 changes: 16 other Chapter 5 CodeEntries
-- Direct changed-resource-name overlap: **0**
+Final patch SHA-256:
 
-A fresh G3MTool binary merge was not repeated for this v0.3.0 build. The compatibility conclusion for v0.3.0 is therefore based on the preserved one-resource Item Giver architecture plus the verified zero-overlap manifest check, not a new runtime merge log.
+- Chapter 1: `ee88093622f0289f1a0093721fe37d6d7d9ad5a3e555fa632b98b632ce63c23c`
+- Chapter 2: `690bcae922d0e7550e8004131a02f44dd45e44b8172cce985fc3df8111bb57f3`
+- Chapter 3: `6bffcb80ea38a175b5d8edfb8d03ec2e21276525db98bc8b069df5d66d942b0f`
+- Chapter 4: `b7e2af8de409589c1138c92eb0229caf799e3974eb7d11d3bdecda1680d16b90`
+- Chapter 5: `626d47da976cc78ff95a7f6f3494b418bdb00198e1ad339586c05ef42ab39fd7`
 
-## Startup smoke test
+G3M-applied output SHA-256:
 
-The Chapter 1 v0.3.0 source build was launched with the supplied Windows DELTARUNE runner under Wine 11.14 and Xvfb. The process remained running in the GameMaker loop for the full **20-second** timeout and was then stopped by the test harness. No immediate startup/data-load crash or runtime error was emitted.
+- Chapter 1: `1af6579ea9eb85f2abf4187471b717f1979d3a42bd5fa7c0988cb3062e445893`
+- Chapter 2: `b5c4b8f5b2bec8403edca9598d6e4a81fab7c4bf4dc5a25d7c2b69bd6c7964cd`
+- Chapter 3: `019fe0ea967705991acf4f6dbfc66dbff214ccd612005f863d8cd402de77310c`
+- Chapter 4: `a95e9a484b51debc700761fa1538555e3a24e313702860137c4e49cbbcf9f3a8`
+- Chapter 5: `67a25340ce19bbf1cccb114453a4d3f7984a09c63b9ca0a8d1baa709e0b9697a`
 
-This smoke test does not replace an interactive Controls-menu/rebinding test.
+## Release-builder verification
+
+The cleaned repository `build_release.py` was itself exercised against all five clean chapters. Chapters 1–5 each compiled and reached G3MTool validation with the expected **3 changed + 2 new** resource counts after Sound-noise removal.
+
+## Real Wine input smoke
+
+A test-only Chapter 1 build added temporary debug messages to the v0.3.1 runtime. Those messages are **not** present in the release.
+
+The supplied DELTARUNE Windows runner was launched under Wine 11.14/Xvfb. After GameMaker entered its main loop, an actual `I` keyboard event was sent to the game window.
+
+Observed runtime markers:
+
+```text
+ITEMGIVER_SMOKE_KEY_PRESSED
+ITEMGIVER_SMOKE_MENU_OPEN
+```
+
+This confirms the rebuilt runtime receives the default `I` key and reaches the menu-open path in a running GameMaker build. An unrelated missing test-environment music stream warning was observed because the smoke directory did not contain the full `mus` folder; it is not part of Item Giver.
+
+## Secret Boss Challenge v0.4.2 compatibility status
+
+The reported `bbox_top` failure occurred in the local-heavy v0.3.0 `obj_time` architecture. v0.3.1 removes that architecture: `obj_time` now gains one helper call and no Item Giver locals.
+
+Secret Boss Challenge v0.4.2 is documented as a native G3M patch with 16 changed Chapter 5 CodeEntries and no new/deleted resources. Its published v0.4.2 delta source does not target Item Giver's new `obj_darkcontroller` Controls handlers or `scr_gg_itemgiver_runtime` helper name.
+
+However, the exact SBC v0.4.2 binary patch was not locally available in this workspace, so a fresh current-version both-order G3M binary merge was not performed. Do **not** treat the combined-mod runtime as fully validated until the user tests both current packages together through Deltamod.
 
 ## Final Deltamod ZIP
 
 - Package ID: `github.itemgivermode.gladiatorgaming`
-- Version: `0.3.0`
+- Version: `0.3.1`
 - Five `type="g3mpatch"` routes
 - ZIP central-directory/data integrity: passed
-- ZIP size: `1,888,802` bytes
-- ZIP SHA-256: `e84654a87c6844606cce6828c49fe3602caeee21eaa6df3bf0871af3b1add052`
+- ZIP SHA-256: `444e81da9f2f73de802c306568e69ef74e06ce8ddf0adbc765699062c3a80cad`
 
-## Manual verification still needed
+## Manual regression still needed
 
-The source and package checks verify the Controls integration logic, but an interactive Windows test is still useful for the final UX details: moving below Finish, rebinding to another key, restarting/loading the save, Reset to default, and opening/closing Item Giver with the saved key.
+The remaining user-side tests are:
+
+1. Open Controls and confirm **ITEM GIVER** appears below Finish.
+2. Rebind it from `I` to another unused key.
+3. Leave/reopen Controls and confirm the key persists.
+4. Confirm the rebound key opens/closes Item Giver.
+5. Confirm Reset to default restores `I`.
+6. Launch Item Giver v0.3.1 together with Secret Boss Challenge v0.4.2 through Deltamod and confirm the previous `bbox_top` crash is gone.
