@@ -1,42 +1,54 @@
-Item Giver Mode v0.3.0
+Item Giver Mode v0.3.1
+======================
 
-Install this ZIP directly through Deltamod.
+Fix release for the broken v0.3.0 Controls integration.
 
-OPENING THE MENU
-- Load a save, then press the Item Giver key outside battle.
-- Default keyboard binding: I
-- The Item Giver key, X, or Escape closes the menu.
+Controls
+--------
+Default Item Giver key: I
 
-REBINDING
-- Open DELTARUNE's normal Controls menu.
-- Move down past Finish to the ITEM GIVER row.
-- Confirm the row, then press the keyboard key you want.
-- The binding is stored in the current save slot's keyconfig_<slot>.ini file.
-- Using Reset to default restores the Item Giver binding to I.
-- Keys already assigned to DELTARUNE's seven normal keyboard actions are rejected to avoid accidental conflicts.
+Open DELTARUNE's normal Controls screen. ITEM GIVER is a real selectable row
+below Finish. Confirm ITEM GIVER, then press an unused keyboard key. Escape
+cancels rebinding. Reset to default restores I.
 
-ITEM GIVER CONTROLS
-- Left / Right: Change category
-- Up / Down: Select entry
-- Page Up / Page Down: Jump by 10
-- Home / End: First / last entry
-- Z / Enter: Give selected entry
-- R: Refresh item definitions
+The selected key is stored per save slot in keyconfig_<slot>.ini under:
 
-CATEGORIES
-- Items
-- Weapons
-- Armor
-- Key Items
-- Light Items
+  [ITEM_GIVER]
+  KEYBOARD=<key code>
 
-COMPATIBILITY
-Version 0.3.0 remains a native .g3mpatch release. Each chapter still changes only one existing DELTARUNE code entry: obj_time's Draw GUI End event. The Controls row, binding persistence, Item Giver input, and overlay all live in that same entry. It adds no GameMaker object, no new event, and no helper-script resource.
+Item Giver menu
+---------------
+Configured Item Giver key : Open / close
+Left / Right               : Change category
+Up / Down                  : Move selection
+Page Up / Page Down        : Jump ten entries
+Home / End                 : First / last entry
+Z / Enter                  : Give selected entry
+R                          : Refresh definitions
+X / Escape                 : Close
 
-This keeps Item Giver's resource footprint separate from Secret Boss Challenge v0.4.2 in Chapter 5.
+v0.3.1 architecture
+-------------------
+v0.3.0 tried to emulate an extra Controls row from obj_time Draw GUI End. That
+pseudo-row did not behave like DELTARUNE's actual Controls menu and the large
+injected body also made obj_time's local-variable metadata fragile when merged.
 
-LIMITATION
-Deltamod 2.0.4 applies CSX patches after G3M merge patches. A third-party CSX mod targeting the same chapter data.win can still overwrite earlier G3M results.
+v0.3.1 instead patches the real obj_darkcontroller Controls Step/Draw code and
+moves Item Giver's runtime into the uniquely named scr_gg_itemgiver_runtime
+script. obj_time Draw GUI End contains only one helper call.
 
-SAVE WARNING
-Some key/unused items rely on story flags. Granting the item does not reproduce every story event or flag normally associated with acquiring it. Back up progression-sensitive saves before experimenting.
+The five patches are Deltamod-native g3mpatch files. UTMT sound serialization
+noise was removed before release so the package does not claim unrelated audio
+resources as Item Giver changes.
+
+Compatibility
+-------------
+Secret Boss Challenge remains a separate mod. The v0.3.1 design removes the
+local-heavy obj_time implementation implicated in the reported bbox_top crash.
+The exact current v0.3.1 + Secret Boss Challenge v0.4.2 binary merge could not
+be rerun in this workspace because the SBC v0.4.2 patch binary was not locally
+available, so a combined Deltamod run is still an important final user test.
+
+Package ID: github.itemgivermode.gladiatorgaming
+Target: DELTARUNE Windows full release v23, Chapters 1-5
+License: MIT
