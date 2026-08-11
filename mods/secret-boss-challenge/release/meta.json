@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Secret Boss Challenge",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "color": {
       "r": 255,
       "g": 105,
       "b": 180
     },
-    "description": "Adds optional harder secret-boss modes, Pink rewards, whole-party Shield, and enhanced Pink Scarf graze bonuses using mergeable G3M patches.",
+    "description": "Adds optional harder secret-boss modes and enhanced rewards. Pink Scarf grants a 75% TP whole-party Shield, +25% graze area, and +10% graze TP gain.",
     "author": [
       "GladiatorGaming"
     ],
