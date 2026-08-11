@@ -8,13 +8,15 @@ This folder contains completed **original standalone DELTARUNE mods**.
 
 Folder: [`secret-boss-challenge/`](secret-boss-challenge/README.md)
 
-- Current version: **0.4.2**
+- Base version: **0.4.2**
+- Current runtime fix: **Shield Hotfix 0.4.2-hf1** (companion package)
 - Chapters 1, 2, and 5
 - Optional secret-boss challenge behavior and enhanced rewards
 - Pink Scarf unlocks a 75% TP whole-party Shield
 - Pink Scarf gives approximately +25% graze area and +10% graze TP gain
-- Distributed as Deltamod-native `g3mpatch` resources for improved multi-mod merging
-- Includes source, package metadata, license, and validation report
+- v0.4.2 has a confirmed Shield-cast `scr_spell` local-variable crash; hf1 bypasses only Shield through a unique helper
+- Base mod and hotfix are Deltamod-native `g3mpatch` packages
+- Includes source and validation records for the hotfix
 
 ### Item Giver Mode
 
@@ -33,7 +35,9 @@ Folder: [`item-giver-mode/`](item-giver-mode/README.md)
 
 ### Item Giver + Secret Boss Challenge compatibility
 
-Use the **two standalone mods above**. The obsolete dedicated combined package remains retired. Item Giver v0.3.1 specifically replaces the local-heavy `obj_time` architecture that caused the reported combined-mod `bbox_top` crash. A fresh exact v0.3.1 + SBC v0.4.2 both-order binary merge is still pending a current SBC binary artifact, so the combined Deltamod run remains a manual regression test.
+Keep the projects separate. The obsolete dedicated combined package remains retired.
+
+Item Giver v0.3.1 and the SBC Shield hf1 G3M patch were merged with G3MTool 1.2.1 in **both orders with 0 conflicts**. The remaining real-Windows regression is to run Item Giver v0.3.1 + SBC v0.4.2 + hf1 together and cast Shield.
 
 ## Project layout
 
