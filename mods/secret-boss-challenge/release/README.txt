@@ -1,8 +1,7 @@
-Secret Boss Challenge v0.4.2
+Secret Boss Challenge v0.4.3
+============================
 
-Install this ZIP directly through Deltamod.
-
-Version 0.4.2 updates Pink Scarf and Shield while keeping the standalone mergeable G3M patch format introduced in v0.4.1.
+This is the complete standalone release. No separate Shield hotfix is needed.
 
 BOSS CHALLENGE
 - Chapters 1 and 2: harder secret-boss variants and expanded route rewards while Boss Challenge is enabled.
@@ -15,15 +14,16 @@ PINK SCARF
 - Unlocks Shield for Ralsei.
 - Shield costs 75% TP.
 - Shield protects the entire active party for the next enemy attack phase.
-- Protected party members take about 25% of normal damage (about 75% damage reduction).
-- Passive graze area bonus increased from about 10% to about 25%.
-- Passive TP gain from grazing remains about 10%.
+- Protected party members take about 25% of normal damage.
+- Passive graze area bonus: about +25%.
+- Passive graze TP gain: about +10%.
 
-PINK'S STAFF
-- Kris equipment: 14 AT, 2 DF, 4 MAG.
+V0.4.3 SHIELD FIX
+Shield no longer adds its whole-party locals to scr_spell. Spell 14 is routed through the unique scr_gg_sbc_shield_apply helper, preventing the bbox_top local-table crash reported in v0.4.2. Pink reward/retry logic is also isolated in scr_gg_sbc_rewards.
 
-COMPATIBILITY
-Secret Boss Challenge remains a standalone Deltamod mod using native .g3mpatch files. Item Giver Mode v0.2.0 changes a different Chapter 5 code resource, so the two standalone G3M patches do not directly overlap.
+DELTAMOD COMPATIBILITY
+The package uses native g3mpatch routes for Chapters 1, 2, and 5. G3MTool 1.2.1 merged SBC v0.4.3 with Item Giver Mode v0.3.1 in both orders for every shared chapter with 0 conflicts.
 
-LIMITATION
-A separate third-party CSX mod targeting the same chapter data.win can still overwrite G3M-merged output because Deltamod 2.0.4 runs CSX after its G3M merge stage.
+Package ID: github.secretbosschallenge.gladiatorgaming
+Target: DELTARUNE Windows full release v23
+License: MIT
