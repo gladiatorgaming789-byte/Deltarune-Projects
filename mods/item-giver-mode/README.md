@@ -1,24 +1,25 @@
 # Item Giver Mode
 
-**Version:** 0.2.0  
+**Version:** 0.3.0  
 **Target:** DELTARUNE Windows full release, launcher version `v23`  
 **Chapters:** 1–5  
 **Installer:** Deltamod native `.g3mpatch` patches
 
-Item Giver Mode is a standalone debug-style inventory browser. Load a save and press **F7** outside battle to browse and grant named definitions from the current chapter.
+Item Giver Mode is a standalone debug-style inventory browser for granting named definitions from the current chapter.
 
-## Version 0.2.0
+## Version 0.3.0
 
-v0.2.0 is a compatibility-focused rewrite. The user-facing menu is retained, but the patch footprint and Deltamod format changed substantially:
+v0.3.0 replaces the hard-coded F7 shortcut with a normal editable keyboard binding.
 
-- Distribution changed from `type="csx"` to native `type="g3mpatch"`.
-- Each chapter changes **one existing code entry only**: `gml_Object_obj_time_Draw_75`.
-- No new GameMaker object is created.
-- No new Step, Cleanup, or helper-script resources are added.
-- F7 input, lazy initialization, item scanning, granting, and the late GUI renderer all live in DELTARUNE's existing persistent `obj_time` Draw GUI End event.
-- The menu still reads the final in-game item tables at runtime, allowing named definitions added by successfully merged mods to appear.
+- Default Item Giver key: **I**.
+- A new **ITEM GIVER** row is available at the bottom of DELTARUNE's Controls screen, immediately after Finish.
+- Select that row and press a keyboard key to rebind Item Giver.
+- The binding is stored per save slot in the same `keyconfig_<slot>.ini` file used by the game's controls, under Item Giver's own section.
+- Choosing **Reset to default** resets the Item Giver key to **I** too.
+- Keys already assigned to DELTARUNE's seven main keyboard actions are rejected so Item Giver does not silently steal a gameplay control.
+- The Item Giver footer displays the currently configured key.
 
-This minimizes Item Giver's resource collision surface and lets Deltamod/G3MTool merge it with other native merge patches instead of one CSX-built `data.win` replacing another.
+The compatibility-focused architecture from v0.2.0 is preserved: each chapter still changes **one existing code entry only**, `gml_Object_obj_time_Draw_75`. The Controls row, binding persistence, input handling, item browser, and late GUI renderer all live in that same native event. No new GameMaker object, event, or helper-script resource is added.
 
 ## Categories
 
@@ -28,11 +29,11 @@ This minimizes Item Giver's resource collision surface and lets Deltamod/G3MTool
 - Key Items
 - Light World items
 
-## Controls
+## Item Giver controls
 
 | Key | Action |
 |---|---|
-| F7 | Open or close |
+| Configured Item Giver key (default **I**) | Open or close |
 | Left / Right | Change category |
 | Up / Down | Move one entry |
 | Page Up / Page Down | Jump ten entries |
@@ -40,6 +41,12 @@ This minimizes Item Giver's resource collision surface and lets Deltamod/G3MTool
 | Z / Enter | Give selected entry |
 | R | Refresh item definitions |
 | X / Escape | Close |
+
+## Rebinding
+
+Open DELTARUNE's normal **Controls** menu and move down past **Finish** to **ITEM GIVER**. Confirm it, then press the keyboard key you want. Escape cancels the rebind.
+
+The binding defaults to `I` for a slot that has never saved an Item Giver key. Reset to default restores `I`.
 
 ## Inventory behavior
 
@@ -49,32 +56,25 @@ Item Giver uses DELTARUNE's native grant functions for each inventory type. It d
 
 ### Secret Boss Challenge
 
-**Item Giver Mode v0.2.0 and Secret Boss Challenge v0.4.1 are separate mods and can be enabled together.**
+Item Giver Mode v0.3.0 and Secret Boss Challenge v0.4.2 remain **separate mods**.
 
-Their packaged patch resources were tested with the **G3MTool 1.2.1 binary bundled inside Deltamod 2.0.4** using the same command style Deltamod uses for multi-mod merging. Chapters 1, 2, and 5 were merged in both mod orders with:
+Item Giver's Chapter 5 patch still changes only `gml_Object_obj_time_Draw_75`. Secret Boss Challenge v0.4.2 changes 16 other Chapter 5 CodeEntries, so their packaged resource-name overlap is **zero**. No dedicated combined package is required.
 
-- **0 G3M conflicts**
-- Item Giver's F7 code retained
-- Secret Boss Challenge retained
-- Pink Scarf and Shield retained in Chapter 5
-
-No dedicated Item Giver + Secret Boss Challenge merged package is required.
+The previous v0.2.0 / Secret Boss Challenge v0.4.1 releases were additionally merged with Deltamod 2.0.4's bundled G3MTool in both orders with zero conflicts. v0.3.0 preserves Item Giver's same one-resource footprint; the current v0.3.0 package was checked directly for zero resource overlap with Secret Boss Challenge v0.4.2.
 
 ### Other mods
 
-The v0.2.0 patch contains one changed CodeEntry and no new/deleted resources, which is intentionally small. It should merge cleanly with mods that do not conflict with `obj_time`'s Draw GUI End code, and G3MTool can resource-merge many independent changes.
+The patch intentionally contains one changed CodeEntry per chapter and no new/deleted resources. This minimizes the collision surface for Deltamod's native G3M merge stage.
 
-Compatibility cannot be guaranteed with every mod. In particular, **Deltamod 2.0.4 runs CSX patches after its G3M merge stage and rebuilds each CSX from the chapter backup**. A third-party mod still distributed as CSX for the same `data.win` can therefore replace previously merged G3M output even when the mods edit unrelated resources. That is an installer-level limitation rather than an Item Giver resource conflict.
-
-For best multi-mod compatibility, use native `g3mpatch`/xdelta releases when available.
+Compatibility cannot be universal. Deltamod 2.0.4 applies CSX patches after its G3M merge stage, so a third-party CSX package targeting the same chapter can replace previously merged G3M output even when the actual edits are unrelated.
 
 ## Installation
 
-Install `Item_Giver_Mode_v0.2.0_Deltamod.zip` directly through Deltamod. The package ID remains `github.itemgivermode.gladiatorgaming`, so it updates earlier Item Giver releases in place.
+Install `Item_Giver_Mode_v0.3.0_Deltamod.zip` directly through Deltamod. The package ID remains `github.itemgivermode.gladiatorgaming`, so it updates older Item Giver releases in place.
 
-The release source under [`release/`](release/) documents how the `.g3mpatch` files are generated from clean chapter files using UndertaleModCli and G3MTool.
+**Release SHA-256:** `e84654a87c6844606cce6828c49fe3602caeee21eaa6df3bf0871af3b1add052`
 
-**Release SHA-256:** `c42703ffa546a74bd0c02c4112e849edcaeb8330001a42f83684efb2b20772f5`
+The reproducible source is under [`release/`](release/). The builder upgrades the compact v0.2.0 append-body baseline to v0.3.0, compiles it against each clean chapter, and creates the native G3M patches.
 
 ## Save warning
 
