@@ -78,6 +78,12 @@ The packaged Chapter 5 manifests were compared directly.
 
 A fresh G3MTool binary merge was not repeated for this v0.3.0 build. The compatibility conclusion for v0.3.0 is therefore based on the preserved one-resource Item Giver architecture plus the verified zero-overlap manifest check, not a new runtime merge log.
 
+## Startup smoke test
+
+The Chapter 1 v0.3.0 source build was launched with the supplied Windows DELTARUNE runner under Wine 11.14 and Xvfb. The process remained running in the GameMaker loop for the full **20-second** timeout and was then stopped by the test harness. No immediate startup/data-load crash or runtime error was emitted.
+
+This smoke test does not replace an interactive Controls-menu/rebinding test.
+
 ## Final Deltamod ZIP
 
 - Package ID: `github.itemgivermode.gladiatorgaming`
