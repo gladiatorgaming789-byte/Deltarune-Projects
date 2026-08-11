@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Build Item Giver Mode v0.3.0 as mergeable Deltamod .g3mpatch files.
+"""Build Item Giver Mode v0.3.1 as Deltamod-native G3M patches.
 
-ItemGiver_Draw75.gml is the compact v0.2.0 append-body baseline. This builder
-upgrades that source to v0.3.0 before compiling it, keeping the distributable
-patch at one existing CodeEntry per chapter.
+v0.3.1 fixes the broken v0.3.0 pseudo Controls row. It patches DELTARUNE's
+real Controls Step/Draw handlers and moves the Item Giver runtime into a
+uniquely named script. obj_time Draw GUI End receives only one helper call.
 """
+from __future__ import annotations
+
 from pathlib import Path
 import argparse
+import json
 import shutil
 import subprocess
 import tempfile
@@ -14,102 +17,342 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent
 CHAPTERS = range(1, 6)
+EXPECTED_CODE_CHANGED = {
+    "gml_Object_obj_darkcontroller_Step_0",
+    "gml_Object_obj_darkcontroller_Draw_0",
+    "gml_Object_obj_time_Draw_75",
+}
+EXPECTED_CODE_NEW = {"gml_Script_scr_gg_itemgiver_runtime"}
+EXPECTED_SCRIPT_NEW = {"scr_gg_itemgiver_runtime"}
+
+CONTROLS_STEP_APPEND = r'''
+// Item Giver v0.3.1: genuine Controls row 9 / keyboard rebinding.
+if (global.menuno == 3 && global.submenu == 35 && !global.is_console)
+{
+    if (!variable_global_exists("ig_itemgiver_key"))
+        global.ig_itemgiver_key = ord("I");
+    if (!variable_instance_exists(id, "ig_bind_debounce"))
+        ig_bind_debounce = 0;
+    if (!variable_instance_exists(id, "ig_bind_message"))
+        ig_bind_message = "";
+    if (!variable_instance_exists(id, "ig_bind_message_timer"))
+        ig_bind_message_timer = 0;
+
+    if (ig_bind_message_timer > 0)
+        ig_bind_message_timer -= 1;
+
+    if (control_select_con == 0 && global.submenucoord[35] == 7 && button1_p())
+    {
+        global.ig_itemgiver_key = ord("I");
+        ig_bind_message = "RESET TO I";
+        ig_bind_message_timer = 60;
+        scr_gg_itemgiver_runtime(1);
+    }
+
+    if (control_select_con == 0 && global.submenucoord[35] == 9 && button1_p())
+    {
+        control_select_con = 3;
+        keyboard_lastkey = -1;
+        ig_bind_debounce = 2;
+        ig_bind_message = "PRESS A KEY";
+        ig_bind_message_timer = 0;
+        selectnoise = 1;
+    }
+    else if (control_select_con == 3)
+    {
+        if (ig_bind_debounce > 0)
+            ig_bind_debounce -= 1;
+        else if (keyboard_check_pressed(vk_escape))
+        {
+            control_select_con = 0;
+            ig_bind_message = "CANCELLED";
+            ig_bind_message_timer = 45;
+            onebuffer = 2;
+            twobuffer = 2;
+        }
+        else if (keyboard_check_pressed(vk_anykey))
+        {
+            ig_bind_candidate = keyboard_lastkey;
+            ig_bind_reserved = false;
+
+            if (ig_bind_candidate < 0 || ig_bind_candidate >= array_length_1d(global.asc_def))
+                ig_bind_reserved = true;
+            if (ig_bind_candidate == vk_enter || ig_bind_candidate == vk_shift || ig_bind_candidate == vk_control || ig_bind_candidate == vk_escape)
+                ig_bind_reserved = true;
+
+            for (ig_bind_index = 0; ig_bind_index < 7; ig_bind_index += 1)
+            {
+                if (global.input_k[ig_bind_index] == ig_bind_candidate)
+                    ig_bind_reserved = true;
+            }
+
+            if (ig_bind_reserved)
+            {
+                ig_bind_message = "KEY IN USE";
+                ig_bind_message_timer = 60;
+            }
+            else
+            {
+                global.ig_itemgiver_key = ig_bind_candidate;
+                control_select_con = 0;
+                ig_bind_message = "SAVED";
+                ig_bind_message_timer = 60;
+                onebuffer = 2;
+                twobuffer = 2;
+                selectnoise = 1;
+                scr_gg_itemgiver_runtime(1);
+            }
+        }
+    }
+}
+'''.strip()
+
+CONTROLS_DRAW_APPEND = r'''
+// Item Giver v0.3.1: draw genuine Controls row 9 after DELTARUNE's native rows.
+if (global.menuno == 3 && global.submenu == 35 && !global.is_console)
+{
+    if (!variable_global_exists("ig_itemgiver_key"))
+        global.ig_itemgiver_key = ord("I");
+
+    draw_set_color(c_white);
+    if (global.submenucoord[35] == 9)
+        draw_set_color(c_aqua);
+    if (global.submenucoord[35] == 9 && control_select_con == 3)
+        draw_set_color(c_red);
+
+    if (global.gamepad_type == "Sony DualShock 4" || global.gamepad_type == "DualSense Wireless Controller")
+        draw_text(xx + 105, ((global.lang == "en") ? (yy + 137) : (yy + 136)) + (9 * (29 + ((global.lang == "ja") ? 1 : 0))) + ((global.lang == "en") ? 0 : -4), "ITEM GIVER");
+    else
+        draw_text(xx + 105, yy + 140 + (9 * (28 + ((global.lang == "ja") ? 1 : 0))) + ((global.lang == "en") ? 0 : -4), "ITEM GIVER");
+
+    draw_text(xx + 325, yy + langopt(0, -8) + 140 + (9 * langopt(28, 30)), (control_select_con == 3) ? "PRESS A KEY" : string(global.asc_def[global.ig_itemgiver_key]));
+
+    if (variable_instance_exists(id, "ig_bind_message_timer") && ig_bind_message_timer > 0)
+        draw_text(xx + 430, yy + langopt(0, -8) + 140 + (9 * langopt(28, 30)), ig_bind_message);
+}
+'''.strip()
 
 
-def run(cmd):
-    print('+', *map(str, cmd))
+def run(cmd: list[Path | str]) -> None:
+    print("+", *map(str, cmd))
     subprocess.run([str(x) for x in cmd], check=True, stdin=subprocess.DEVNULL)
 
 
-def upgrade_gml(src: str) -> str:
-    src = src.replace('// Item Giver v0.2.0', '// Item Giver v0.3.0', 1)
-    src = src.replace('ig_itemgiver_version = "0.2.0";', 'ig_itemgiver_version = "0.3.0";', 1)
-
-    old = '    ig_category_names = ["ITEMS", "WEAPONS", "ARMOR", "KEY ITEMS", "LIGHT ITEMS"];'
-    new = old + '''\n    // [5] keyboard binding, [6] loaded file slot, [7] rebind state, [8] debounce\n    array_push(ig_category_names, ord("I"));\n    array_push(ig_category_names, -999);\n    array_push(ig_category_names, 0);\n    array_push(ig_category_names, 0);'''
-    if old not in src:
-        raise RuntimeError('Could not find Item Giver state initialization anchor')
-    src = src.replace(old, new, 1)
-
-    marker = '''if (ig_status_timer > 0)\n    ig_status_timer--;'''
-    load = '''// Load the Item Giver binding for the current save slot.\nif (variable_global_exists("filechoice") && ig_category_names[6] != global.filechoice)\n{\n    ig_category_names[5] = ord("I");\n    ig_category_names[6] = global.filechoice;\n    ig_category_names[7] = 0;\n    ig_category_names[8] = 0;\n    var _ig_cfg = "keyconfig_" + string(global.filechoice) + ".ini";\n    if (ossafe_file_exists(_ig_cfg))\n    {\n        ossafe_ini_open(_ig_cfg);\n        ig_category_names[5] = ini_read_real("ITEM_GIVER", "KEYBOARD", ord("I"));\n        if (!global.is_console)\n            ini_close();\n        else\n            ossafe_ini_close();\n    }\n}\n\n''' + marker
-    if marker not in src:
-        raise RuntimeError('Could not find status-timer anchor')
-    src = src.replace(marker, load, 1)
-
-    logic_anchor = '''var _ig_rebuild = false;\nvar _ig_need_preview = false;'''
-    logic = '''var _ig_rebuild = false;\nvar _ig_need_preview = false;\nvar _ig_controls_active = (!global.is_console && variable_global_exists("submenu") && global.submenu == 35 && i_ex(obj_darkcontroller));\n\n// Add ITEM GIVER as pseudo-row 9 below the game's native Controls rows.\n// This intentionally avoids changing obj_darkcontroller, preserving the one-CodeEntry footprint.\nif (_ig_controls_active)\n{\n    if (ig_category_names[7] == 0)\n    {\n        if (global.submenucoord[35] == 8 && down_p())\n            global.submenucoord[35] = 9;\n\n        if (global.submenucoord[35] == 9 && up_p())\n            global.submenucoord[35] = 8;\n\n        if (global.submenucoord[35] == 9 && button1_p())\n        {\n            ig_category_names[7] = 1;\n            ig_category_names[8] = 2;\n            ig_status_text = "Press a keyboard key for Item Giver. Esc cancels.";\n            ig_status_ok = true;\n            ig_status_timer = 180;\n        }\n        else if (global.submenucoord[35] == 7 && button1_p())\n        {\n            ig_category_names[5] = ord("I");\n            var _ig_cfg_reset = "keyconfig_" + string(global.filechoice) + ".ini";\n            ossafe_ini_open(_ig_cfg_reset);\n            ini_write_real("ITEM_GIVER", "KEYBOARD", ig_category_names[5]);\n            if (!global.is_console)\n                ini_close();\n            else\n            {\n                ossafe_ini_close();\n                ossafe_savedata_save();\n            }\n            ig_status_text = "Item Giver key reset to I.";\n            ig_status_ok = true;\n            ig_status_timer = 120;\n        }\n    }\n    else\n    {\n        if (ig_category_names[8] > 0)\n            ig_category_names[8]--;\n        else if (keyboard_check_pressed(vk_escape))\n        {\n            ig_category_names[7] = 0;\n            ig_status_text = "Item Giver rebind cancelled.";\n            ig_status_ok = false;\n            ig_status_timer = 90;\n        }\n        else if (keyboard_check_pressed(vk_anykey))\n        {\n            var _ig_new_key = keyboard_lastkey;\n            var _ig_reserved = false;\n            for (var _ig_key_i = 0; _ig_key_i < 7; _ig_key_i++)\n            {\n                if (global.input_k[_ig_key_i] == _ig_new_key)\n                    _ig_reserved = true;\n            }\n            if (_ig_new_key == vk_enter || _ig_new_key == vk_shift || _ig_new_key == vk_control || _ig_new_key == vk_escape)\n                _ig_reserved = true;\n\n            if (_ig_reserved)\n            {\n                ig_status_text = "That key is already reserved. Choose another key.";\n                ig_status_ok = false;\n                ig_status_timer = 120;\n            }\n            else\n            {\n                ig_category_names[5] = _ig_new_key;\n                ig_category_names[7] = 0;\n                var _ig_cfg_save = "keyconfig_" + string(global.filechoice) + ".ini";\n                ossafe_ini_open(_ig_cfg_save);\n                ini_write_real("ITEM_GIVER", "KEYBOARD", ig_category_names[5]);\n                if (!global.is_console)\n                    ini_close();\n                else\n                {\n                    ossafe_ini_close();\n                    ossafe_savedata_save();\n                }\n                ig_status_text = "Item Giver key set to " + string(global.asc_def[ig_category_names[5]]) + ".";\n                ig_status_ok = true;\n                ig_status_timer = 120;\n            }\n        }\n    }\n}\nelse\n{\n    ig_category_names[7] = 0;\n    ig_category_names[8] = 0;\n}\n\nvar _ig_bind_pressed = keyboard_check_pressed(ig_category_names[5]);'''
-    if logic_anchor not in src:
-        raise RuntimeError('Could not find Item Giver logic anchor')
-    src = src.replace(logic_anchor, logic, 1)
-
-    if src.count('keyboard_check_pressed(vk_f7)') != 2:
-        raise RuntimeError('Unexpected F7 source layout')
-    src = src.replace('keyboard_check_pressed(vk_f7)', '_ig_bind_pressed')
-    src = src.replace('''    if (_ig_bind_pressed)\n    {''', '''    if (_ig_bind_pressed && !_ig_controls_active)\n    {''', 1)
-
-    footer = '"Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F7: Close"'
-    replacement = '"Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/" + string(global.asc_def[ig_category_names[5]]) + ": Close"'
-    if footer not in src:
-        raise RuntimeError('Could not find Item Giver footer anchor')
-    src = src.replace(footer, replacement, 1)
-
-    draw_anchor = '''if (!ig_menu_open)\n{\n    if (ig_status_timer > 0)'''
-    draw_insert = '''if (!ig_menu_open)\n{\n    if (_ig_controls_active)\n    {\n        var _ig_ctrl_xx = obj_darkcontroller.xx;\n        var _ig_ctrl_yy = obj_darkcontroller.yy;\n        var _ig_ctrl_yoff = (global.lang == "en") ? 0 : -4;\n        var _ig_ctrl_linepad = (global.lang == "ja") ? 1 : 0;\n        var _ig_ctrl_dualshock = global.gamepad_type == "Sony DualShock 4" || global.gamepad_type == "DualSense Wireless Controller";\n        var _ig_ctrl_text_y;\n        if (_ig_ctrl_dualshock)\n            _ig_ctrl_text_y = ((global.lang == "en") ? (_ig_ctrl_yy + 137) : (_ig_ctrl_yy + 136)) + (9 * (29 + _ig_ctrl_linepad)) + _ig_ctrl_yoff;\n        else\n            _ig_ctrl_text_y = _ig_ctrl_yy + 140 + (9 * (28 + _ig_ctrl_linepad)) + _ig_ctrl_yoff;\n        var _ig_ctrl_voff = langopt(0, -8);\n        var _ig_ctrl_vspacing = langopt(28, 30);\n        var _ig_ctrl_key_y = _ig_ctrl_yy + _ig_ctrl_voff + 140 + (9 * _ig_ctrl_vspacing);\n        draw_set_halign(fa_left);\n        draw_set_color((global.submenucoord[35] == 9) ? c_aqua : c_white);\n        if (ig_category_names[7] == 1)\n            draw_set_color(c_red);\n        draw_text(_ig_ctrl_xx + 105, _ig_ctrl_text_y, "ITEM GIVER");\n        draw_text(_ig_ctrl_xx + 325, _ig_ctrl_key_y, (ig_category_names[7] == 1) ? "PRESS A KEY" : string(global.asc_def[ig_category_names[5]]));\n    }\n    if (ig_status_timer > 0)'''
-    if draw_anchor not in src:
-        raise RuntimeError('Could not find Draw GUI controls anchor')
-    src = src.replace(draw_anchor, draw_insert, 1)
-    return src
+def csharp_verbatim(text: str) -> str:
+    return text.replace('"', '""')
 
 
-def make_csx(chapter: int, output: Path):
-    template = (ROOT / 'ItemGiver_template.csx').read_text(encoding='utf-8')
-    gml = upgrade_gml((ROOT / 'ItemGiver_Draw75.gml').read_text(encoding='utf-8'))
-    gml = gml.replace('"', '""')
-    text = template.replace('__CHAPTER__', str(chapter)).replace('__GML_BODY__', gml)
-    output.write_text(text, encoding='utf-8', newline='\n')
+def find_clean(game_root: Path, chapter: int) -> Path:
+    candidates = [
+        game_root / f"chapter{chapter}_windows" / "data.win",
+        game_root / f"chapter{chapter}_windows" / f"chapter{chapter}_windows" / "data.win",
+        game_root / f"chapter{chapter}_windows" / f"chapter{chapter}_windows" / f"chapter{chapter}_windows" / "data.win",
+    ]
+    for path in candidates:
+        if path.is_file():
+            return path
+    raise FileNotFoundError(f"Could not find clean Chapter {chapter} data.win under {game_root}")
 
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument('--game-root', type=Path, required=True,
-                   help='Folder containing chapter1_windows ... chapter5_windows')
-    p.add_argument('--utmt', type=Path, required=True, help='UndertaleModCli executable')
-    p.add_argument('--g3mtool', type=Path, required=True, help='Deltamod-compatible G3MTool executable')
-    p.add_argument('--output', type=Path, default=ROOT / 'Item_Giver_Mode_v0.3.0_Deltamod.zip')
-    args = p.parse_args()
+def make_csx(chapter: int, runtime: str, step_append: str, draw_append: str) -> str:
+    runtime_cs = csharp_verbatim(runtime)
+    step_cs = csharp_verbatim(step_append)
+    draw_cs = csharp_verbatim(draw_append)
+    return f'''using System;
+using System.Linq;
+using UndertaleModLib.Models;
+using UndertaleModLib.Decompiler;
+using UndertaleModLib.Compiler;
+using Underanalyzer.Decompiler;
 
-    with tempfile.TemporaryDirectory(prefix='item_giver_build_') as temp_name:
-        temp = Path(temp_name)
-        stage = temp / 'package'
-        patches = stage / 'patches'
+EnsureDataLoaded();
+
+if (!Data.IsVersionAtLeast(2023, 6))
+{{
+    ScriptError("Item Giver requires the DELTARUNE full release.");
+    return;
+}}
+
+string displayName = Data?.GeneralInfo?.DisplayName?.Content?.ToLowerInvariant() ?? "";
+if (!displayName.Contains("chapter {chapter}") && !displayName.Contains("chapitre {chapter}"))
+{{
+    ScriptError("This Item Giver source patch is for Chapter {chapter} only.");
+    return;
+}}
+
+GlobalDecompileContext globalDecompileContext = new(Data);
+IDecompileSettings decompilerSettings = new DecompileSettings();
+UndertaleModLib.Compiler.CodeImportGroup importGroup = new(Data, globalDecompileContext, decompilerSettings)
+{{
+    ThrowOnNoOpFindReplace = true
+}};
+
+var runtimeName = "gml_Script_scr_gg_itemgiver_runtime";
+var runtimeCode = Data.Code.ByName(runtimeName);
+if (runtimeCode == null)
+{{
+    UndertaleModLib.Compiler.CodeImportGroup runtimeGroup = new(Data, globalDecompileContext, decompilerSettings);
+    runtimeGroup.QueueReplace(runtimeName, @"{runtime_cs}");
+    runtimeGroup.Import();
+    runtimeCode = Data.Code.ByName(runtimeName);
+    if (runtimeCode == null)
+    {{
+        ScriptError("Item Giver failed to create its runtime code entry.");
+        return;
+    }}
+}}
+if (Data.Scripts.ByName("scr_gg_itemgiver_runtime") == null)
+    Data.Scripts.Add(new UndertaleScript() {{ Name = Data.Strings.MakeString("scr_gg_itemgiver_runtime"), Code = runtimeCode }});
+Data.Functions.EnsureDefined("scr_gg_itemgiver_runtime", Data.Strings);
+
+var draw75 = Data.Code.ByName("gml_Object_obj_time_Draw_75");
+var step0 = Data.Code.ByName("gml_Object_obj_darkcontroller_Step_0");
+var draw0 = Data.Code.ByName("gml_Object_obj_darkcontroller_Draw_0");
+if (draw75 == null || step0 == null || draw0 == null)
+{{
+    ScriptError("Item Giver could not find DELTARUNE's required controller code.");
+    return;
+}}
+
+var timeText = GetDecompiledText(draw75);
+if (!timeText.Contains("scr_gg_itemgiver_runtime"))
+    importGroup.QueueAppend(draw75, "scr_gg_itemgiver_runtime();");
+
+var stepText = GetDecompiledText(step0);
+string navOld = "if (global.submenucoord[35] < 8)";
+string navNew = "if (global.submenucoord[35] < (global.is_console ? 8 : 9))";
+if (!stepText.Contains(navNew))
+{{
+    int navCount = stepText.Split(new[] {{ navOld }}, StringSplitOptions.None).Length - 1;
+    if (navCount != 1)
+    {{
+        ScriptError("Item Giver expected exactly one Controls navigation anchor, found " + navCount + ".");
+        return;
+    }}
+    stepText = stepText.Replace(navOld, navNew);
+}}
+if (!stepText.Contains("Item Giver v0.3.1: genuine Controls row 9"))
+    stepText += @"\n{step_cs}\n";
+importGroup.QueueReplace(step0, stepText);
+
+var drawText = GetDecompiledText(draw0);
+if (!drawText.Contains("Item Giver v0.3.1: draw genuine Controls row 9"))
+    drawText += @"\n{draw_cs}\n";
+importGroup.QueueReplace(draw0, drawText);
+
+importGroup.Import();
+ScriptMessage("Item Giver v0.3.1 installed for Chapter {chapter}. Controls row: ITEM GIVER; default key: I.");
+'''
+
+
+def resource_names(group: dict, key: str) -> set[str]:
+    return {item["name"] for item in group.get(key, [])}
+
+
+def strip_serialization_noise(source: Path, destination: Path) -> None:
+    """Remove UTMT-only Sound diffs and reject every other unexpected resource."""
+    with zipfile.ZipFile(source, "r") as zin:
+        manifest = json.loads(zin.read("g3mpatch.json"))
+        resources = manifest.get("resources", {})
+
+        unexpected_types = set(resources) - {"Scripts", "CodeEntries", "Sounds"}
+        if unexpected_types:
+            raise RuntimeError(f"Unexpected G3M resource types: {sorted(unexpected_types)}")
+
+        scripts = resources.get("Scripts", {})
+        code = resources.get("CodeEntries", {})
+        if resource_names(scripts, "new") != EXPECTED_SCRIPT_NEW:
+            raise RuntimeError("Unexpected new Script resource set")
+        if resource_names(scripts, "changed") or resource_names(scripts, "deleted"):
+            raise RuntimeError("Unexpected changed/deleted Scripts")
+        if resource_names(code, "changed") != EXPECTED_CODE_CHANGED:
+            raise RuntimeError("Unexpected changed CodeEntry set")
+        if resource_names(code, "new") != EXPECTED_CODE_NEW:
+            raise RuntimeError("Unexpected new CodeEntry set")
+        if resource_names(code, "deleted"):
+            raise RuntimeError("Unexpected deleted CodeEntries")
+
+        resources.pop("Sounds", None)
+        manifest["resources"] = resources
+
+        changed = sum(len(v.get("changed", [])) for v in resources.values())
+        new = sum(len(v.get("new", [])) for v in resources.values())
+        deleted = sum(len(v.get("deleted", [])) for v in resources.values())
+        changed_files = sum(sum(len(x.get("files", {})) for x in v.get("changed", [])) for v in resources.values())
+        new_files = sum(sum(len(x.get("files", {})) for x in v.get("new", [])) for v in resources.values())
+        manifest["statistics"] = {
+            "totalChanged": changed,
+            "totalNew": new,
+            "totalDeleted": deleted,
+            "totalChangedFiles": changed_files,
+            "totalNewFiles": new_files,
+        }
+        manifest["applyPlan"] = {
+            "mode": "standard",
+            "requiresCodePipeline": True,
+            "requiresTexturePipeline": False,
+            "requiresAssetReorder": True,
+            "requiresHeavyFinalize": True,
+            "supportsDirectResourceApply": False,
+            "simpleResourceTypes": [],
+            "heavyResourceTypes": ["CodeEntries", "Scripts"],
+        }
+
+        with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zout:
+            for info in zin.infolist():
+                if info.filename == "g3mpatch.json" or info.filename.startswith("Sounds/"):
+                    continue
+                zout.writestr(info, zin.read(info.filename))
+            zout.writestr("g3mpatch.json", json.dumps(manifest, indent=2).encode("utf-8"))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--game-root", type=Path, required=True,
+                        help="Folder containing chapter1_windows ... chapter5_windows")
+    parser.add_argument("--utmt", type=Path, required=True, help="UndertaleModCli executable")
+    parser.add_argument("--g3mtool", type=Path, required=True, help="G3MTool 1.2.1-compatible executable")
+    parser.add_argument("--output", type=Path, default=ROOT / "Item_Giver_Mode_v0.3.1_Deltamod.zip")
+    args = parser.parse_args()
+
+    # Historical filename retained so older repository links keep working.
+    # In v0.3.1 it contains the isolated helper-script body, not obj_time's full Draw body.
+    runtime = (ROOT / "ItemGiver_Draw75.gml").read_text(encoding="utf-8")
+    step_append = CONTROLS_STEP_APPEND
+    draw_append = CONTROLS_DRAW_APPEND
+
+    with tempfile.TemporaryDirectory(prefix="item_giver_v031_") as tmp_name:
+        tmp = Path(tmp_name)
+        stage = tmp / "package"
+        patches = stage / "patches"
         patches.mkdir(parents=True)
-        for name in ('meta.json', 'modding.xml', 'README.txt', 'LICENSE'):
+        for name in ("meta.json", "modding.xml", "README.txt", "LICENSE"):
             shutil.copy2(ROOT / name, stage / name)
 
         for chapter in CHAPTERS:
-            clean = args.game_root / f'chapter{chapter}_windows' / 'data.win'
-            modified = temp / f'ch{chapter}_modified.win'
-            csx = temp / f'ItemGiver_ch{chapter}.csx'
-            patch = patches / f'ItemGiver_ch{chapter}.g3mpatch'
-            if not clean.exists():
-                raise FileNotFoundError(clean)
-            make_csx(chapter, csx)
-            run([args.utmt, 'load', clean, '--output', modified, '--scripts', csx])
-            run([args.g3mtool, 'patch', 'create', clean, modified, patch])
-            run([args.g3mtool, 'patch', 'validate', patch, '--data', clean])
+            clean = find_clean(args.game_root, chapter)
+            modified = tmp / f"ch{chapter}_modified.win"
+            csx = tmp / f"ItemGiver_ch{chapter}_v031.csx"
+            raw_patch = tmp / f"ItemGiver_ch{chapter}_raw.g3mpatch"
+            final_patch = patches / f"ItemGiver_ch{chapter}.g3mpatch"
+            csx.write_text(make_csx(chapter, runtime, step_append, draw_append), encoding="utf-8", newline="\n")
+
+            run([args.utmt, "load", clean, "--output", modified, "--scripts", csx])
+            run([args.g3mtool, "patch", "create", clean, modified, raw_patch])
+            strip_serialization_noise(raw_patch, final_patch)
+            run([args.g3mtool, "patch", "validate", final_patch, "--data", clean])
 
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(args.output, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-            for file in sorted(stage.rglob('*')):
-                if file.is_file():
-                    archive.write(file, file.relative_to(stage).as_posix())
-        with zipfile.ZipFile(args.output) as archive:
-            bad = archive.testzip()
+        with zipfile.ZipFile(args.output, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as outzip:
+            for path in sorted(stage.rglob("*")):
+                if path.is_file():
+                    outzip.write(path, path.relative_to(stage).as_posix())
+        with zipfile.ZipFile(args.output) as check:
+            bad = check.testzip()
             if bad:
-                raise RuntimeError(f'ZIP integrity failure: {bad}')
-        print('Wrote', args.output)
+                raise RuntimeError(f"ZIP integrity failure: {bad}")
+        print("Wrote", args.output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
