@@ -1,7 +1,29 @@
-// Item Giver v0.2.0 - intentionally contained in obj_time Draw GUI End for merge compatibility.
+// Item Giver Mode v0.3.1 runtime.
+// Runs from a tiny call appended to obj_time Draw GUI End.
+
+// Mode 1 is used by the real Controls handler to persist a changed binding.
+if (argument_count > 0 && argument0 == 1)
+{
+    if (!variable_global_exists("ig_itemgiver_key"))
+        global.ig_itemgiver_key = ord("I");
+    if (variable_global_exists("filechoice"))
+    {
+        ossafe_ini_open("keyconfig_" + string(global.filechoice) + ".ini");
+        ini_write_real("ITEM_GIVER", "KEYBOARD", global.ig_itemgiver_key);
+        if (!global.is_console)
+            ini_close();
+        else
+        {
+            ossafe_ini_close();
+            ossafe_savedata_save();
+        }
+    }
+    return;
+}
+
 if (!variable_instance_exists(id, "ig_itemgiver_version"))
 {
-    ig_itemgiver_version = "0.2.0";
+    ig_itemgiver_version = "0.3.1";
     ig_menu_open = false;
     ig_lists_built = false;
     ig_category = 0;
@@ -10,6 +32,7 @@ if (!variable_instance_exists(id, "ig_itemgiver_version"))
     ig_status_timer = 0;
     ig_status_ok = true;
     ig_saved_interact = 0;
+    ig_loaded_slot = -999999;
     ig_category_names = ["ITEMS", "WEAPONS", "ARMOR", "KEY ITEMS", "LIGHT ITEMS"];
     ig_item_ids = [];
     ig_item_names = [];
@@ -27,15 +50,37 @@ if (!variable_instance_exists(id, "ig_itemgiver_version"))
     ig_preview_extra = "";
 }
 
+if (!variable_global_exists("ig_itemgiver_key"))
+    global.ig_itemgiver_key = ord("I");
+
+// Load the per-slot binding once the game has a real save slot selected.
+if (variable_global_exists("filechoice") && ig_loaded_slot != global.filechoice)
+{
+    ig_loaded_slot = global.filechoice;
+    global.ig_itemgiver_key = ord("I");
+    var _ig_cfg = "keyconfig_" + string(global.filechoice) + ".ini";
+    if (ossafe_file_exists(_ig_cfg))
+    {
+        ossafe_ini_open(_ig_cfg);
+        global.ig_itemgiver_key = ini_read_real("ITEM_GIVER", "KEYBOARD", ord("I"));
+        if (!global.is_console)
+            ini_close();
+        else
+            ossafe_ini_close();
+    }
+}
+
 if (ig_status_timer > 0)
     ig_status_timer--;
 
 var _ig_rebuild = false;
 var _ig_need_preview = false;
+var _ig_bind_pressed = keyboard_check_pressed(global.ig_itemgiver_key);
+var _ig_controls_active = variable_global_exists("submenu") && global.submenu == 35 && instance_exists(obj_darkcontroller);
 
 if (!ig_menu_open)
 {
-    if (keyboard_check_pressed(vk_f7))
+    if (_ig_bind_pressed && !_ig_controls_active)
     {
         if (instance_exists(obj_battlecontroller))
         {
@@ -77,7 +122,7 @@ else
         if (variable_global_exists("interact"))
             global.interact = 1;
 
-        if (keyboard_check_pressed(vk_f7) || keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("X")))
+        if (_ig_bind_pressed || keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("X")))
         {
             ig_menu_open = false;
             if (variable_global_exists("interact"))
@@ -257,16 +302,16 @@ if (_ig_rebuild)
     }
 
     var _ig_old_light_item = global.litem[7];
-    for (var _ig_scan_id = 1; _ig_scan_id <= 255; _ig_scan_id++)
+    for (var _ig_scan_light_id = 1; _ig_scan_light_id <= 255; _ig_scan_light_id++)
     {
-        global.litem[7] = _ig_scan_id;
+        global.litem[7] = _ig_scan_light_id;
         global.litemname[7] = " ";
         scr_litemname();
         var _ig_light_name = string(global.litemname[7]);
         var _ig_light_clean = string_replace_all(string_replace_all(_ig_light_name, " ", ""), "#", "");
         if (string_length(_ig_light_clean) > 0)
         {
-            array_push(ig_light_ids, _ig_scan_id);
+            array_push(ig_light_ids, _ig_scan_light_id);
             array_push(ig_light_names, _ig_light_name);
         }
     }
@@ -351,7 +396,7 @@ var _ig_gh = display_get_gui_height();
 
 if (!ig_menu_open)
 {
-    if (ig_status_timer > 0)
+    if (ig_status_timer > 0 && !_ig_controls_active)
     {
         var _ig_toast_w = min(440, _ig_gw - 24);
         var _ig_toast_x = (_ig_gw - _ig_toast_w) * 0.5;
@@ -474,7 +519,10 @@ else
 
     draw_set_color(c_gray);
     draw_set_halign(fa_center);
-    draw_text(_ig_gw * 0.5, _ig_py + _ig_panel_h - 24, "Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/F7: Close");
+    var _ig_key_name = "I";
+    if (variable_global_exists("asc_def"))
+        _ig_key_name = string(global.asc_def[global.ig_itemgiver_key]);
+    draw_text(_ig_gw * 0.5, _ig_py + _ig_panel_h - 24, "Arrows: Navigate   PgUp/PgDn: Jump   Z/Enter: Give   R: Refresh   X/Esc/" + _ig_key_name + ": Close");
 }
 
 draw_set_halign(_ig_old_halign);
