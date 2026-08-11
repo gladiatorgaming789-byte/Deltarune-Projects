@@ -37,7 +37,7 @@ var drawCode = objTime.EventHandlerFor(EventType.Draw, (uint)75, Data);
 var existing = GetDecompiledText(drawCode);
 if (existing.Contains("ig_itemgiver_version"))
 {
-    ScriptMessage("Item Giver v0.2.0 is already installed for Chapter __CHAPTER__.");
+    ScriptMessage("Item Giver v0.3.0 is already installed for Chapter __CHAPTER__.");
     return;
 }
 
@@ -45,4 +45,4 @@ importGroup.QueueAppend(drawCode,
 @"__GML_BODY__");
 
 importGroup.Import();
-ScriptMessage("Item Giver v0.2.0 source patch installed for Chapter __CHAPTER__. Press F7 outside battle.");
+ScriptMessage("Item Giver v0.3.0 source patch installed for Chapter __CHAPTER__. Default binding: I; rebind it from Controls.");
