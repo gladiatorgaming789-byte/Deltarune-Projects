@@ -1,13 +1,13 @@
 {
   "metadata": {
     "name": "Item Giver Mode",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "color": {
       "r": 80,
       "g": 220,
       "b": 255
     },
-    "description": "Adds an F7 item browser using a minimal native G3M merge patch for broad mod compatibility.",
+    "description": "Adds an item browser with a rebindable Controls-menu hotkey (default I) using a minimal native G3M merge patch.",
     "author": [
       "GladiatorGaming"
     ],
