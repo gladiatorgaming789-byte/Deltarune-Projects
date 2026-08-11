@@ -17,16 +17,17 @@ All completed work is organized by project type. Installable builds must remain 
 ### Standalone mods
 
 - [Secret Boss Challenge](mods/secret-boss-challenge/README.md)
-  - Current version: **0.4.2**
-  - Native Deltamod `g3mpatch` release source for Chapters 1, 2, and 5
-  - Boss Challenge, Pink rewards, whole-party Shield, +25% graze area, and +10% graze TP gain
+  - Current version: **0.4.3**
+  - Native Deltamod `g3mpatch` release for Chapters 1, 2, and 5
+  - Boss Challenge, Pink rewards, integrated whole-party Shield fix, +25% graze area, and +10% graze TP gain
+  - No separate Shield hotfix is required
 - [Item Giver Mode](mods/item-giver-mode/README.md)
   - Current version: **0.3.1**
   - Native Deltamod `g3mpatch` release for Chapters 1–5
   - Item browser with a genuine editable Controls-menu binding; default **I**
-  - v0.3.1 replaces the broken pseudo Controls row and isolates the runtime from `obj_time` locals
+  - Runtime isolated from `obj_time` locals
 
-Item Giver Mode and Secret Boss Challenge remain **separate mods**. The obsolete dedicated combined package stays retired.
+Item Giver Mode v0.3.1 and Secret Boss Challenge v0.4.3 remain **separate mods**. Their actual G3M patches were tested in both priority orders for Chapters 1, 2, and 5 with zero conflicts. The obsolete dedicated combined package stays retired.
 
 ### Merged mods
 
