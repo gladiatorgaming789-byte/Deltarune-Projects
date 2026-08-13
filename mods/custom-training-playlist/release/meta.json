@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "name": "Custom Training Playlist (POC)",
+    "version": "0.1.4",
+    "color": {
+      "r": 120,
+      "g": 210,
+      "b": 255
+    },
+    "description": "Chapter 1 proof-of-concept attack trainer. Press N in safe Dark World free roam to practice original Jevil Pattern 0; F7 aborts cleanly.",
+    "author": [
+      "GladiatorGaming"
+    ],
+    "packageID": "github.customtrainingplaylist.gladiatorgaming",
+    "game": "toby.deltarune",
+    "mergeSupport": true,
+    "tags": [
+      "trainer",
+      "practice",
+      "battle",
+      "utility"
+    ]
+  },
+  "deltaruneTargetVersion": "v23",
+  "neededFiles": [
+    {
+      "file": "chapter1_windows/data.win",
+      "checksum": "82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70"
+    }
+  ]
+}
