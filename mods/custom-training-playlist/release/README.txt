@@ -1,43 +1,78 @@
-Custom Training Playlist v0.1.4 POC
-==================================
+Custom Training Playlist v0.2.0
+===============================
 
-Chapter 1 proof of concept for the future Custom Training Playlist trainer.
+Chapter 1 Jevil training playlist editor + runner.
 
-CONTROLS
-- N: Start Jevil Pattern 0 training.
-- F7: Abort once the trainer battle is active.
+EDITOR CONTROLS
+- N: Open the trainer editor during safe free roam.
+- Left / Right: Switch between Pattern catalog and Playlist panes.
+- Up / Down: Move selection.
+- Z / Enter: Add highlighted pattern to the playlist.
+- Delete / Backspace: Remove highlighted playlist entry.
+- Q / E: Move highlighted playlist entry up / down.
+- C: Clear playlist.
+- P: Practice highlighted pattern immediately.
+- S: Start the full playlist.
+- X / Escape: Close editor.
+- Playlist capacity: 32 entries.
 
-START REQUIREMENTS
-- Chapter 1 Dark World free roam with obj_mainchara active.
-- No existing battle/encounter/end-battle transition.
-- DELTARUNE must currently allow normal player interaction (global.interact == 0).
-- A fixed three-person party is NOT required; the encounter uses the currently active party state.
+TRAINING CONTROLS
+- R: Retry current pattern.
+- K: Skip current pattern.
+- T: Restart playlist from entry 1. In single-pattern practice, restart that pattern.
+- F7: Quit training and return to the saved location.
 
-v0.1.4 RUNTIME FIXES
-- Fixed N appearing to do nothing because v0.1.3 over-gated valid launch states.
-- Uses literal keycode 78 for N, independent of DELTARUNE's configurable action keys.
-- Initializes global.turntimer before forcing Jevil into the enemy phase.
-- Removed the separate cleanup-script call from the live controller path; teardown is self-contained.
-- Tracks and removes the exact Jevil boss/body instances created by the trainer.
-- Performs a post-obj_endbattle sweep of battle SOUL, graze, bullet, and transition helpers.
-- Preserves the stock-exit, HP/state restoration, timer-race, target-selection, and Jevil adapter fixes.
+STAGES COMPLETED IN v0.2.0
+- Stage 5: Playlist Editor.
+- Stage 6: Playlist Runner.
+- Stage 7: Runtime Controls.
+- Stage 8: Trainer-Safe Defeat Handling.
+- Stage 9: Session Statistics.
 
-POC SCOPE
-- Only Jevil Pattern 0 is exposed by N.
-- All 16 normal Jevil pattern adapters remain mapped for later playlist work.
-- No playlist browser/editor UI yet.
-- F8 is NOT part of the release. It was used only in the isolated runtime test harness.
-- Training-session death/game-over policy is not implemented yet.
+BEHAVIOR
+- All 16 normal Jevil patterns are available.
+- The trainer temporarily stages Kris + Susie + Ralsei in a neutral Dark World room.
+- Party turn order remains Kris -> Susie -> Ralsei -> Jevil.
+- The selected Jevil controller starts only after the stock 12-frame enemy-phase startup and after the real battle SOUL exists.
+- Multi-pattern playlists remain in one trainer battle and return through DELTARUNE's stock end-turn path between patterns.
+- Trainer defeat is intercepted before the normal Game Over flow; Retry/Skip/Restart/Quit remain available.
+- Original room, position, world state, party, HP, and saved temporary battle state are restored when training ends.
+
+SESSION RESULTS
+- Attempts
+- Patterns cleared
+- No-hit clears
+- Hits taken
+- Damage taken
+- Session time
+
+FINAL CORRECTNESS FIXES
+- Retry and Restart now correctly re-arm Jevil even in single-pattern practice.
+- Damage accounting clamps a downing hit to the character's remaining positive HP, preventing DELTARUNE's negative downed-HP bookkeeping from inflating results.
 
 RUNTIME VALIDATION
-Natural completion and F7 abort were both validated under Wine/Xvfb using real X11 XTEST key events. Both returned to the overworld with the process alive and no leftover Jevil, battle SOUL, bullets, or helper objects.
+- Playlist add/move/remove: PASS.
+- Two-pattern automatic advance: PASS.
+- Runtime Retry/Skip/Restart: PASS.
+- Trainer-safe defeat + Retry: PASS.
+- Single-pattern Retry/Restart regression: PASS.
+- F7 cleanup/return: PASS.
+- Results panel: PASS.
+- G3M apply + round-trip decompile: PASS.
 
-DELTAMOD COMPATIBILITY
-- Native g3mpatch package; mergeSupport is enabled.
-- Final patch footprint: 1 changed CodeEntry + 2 new Scripts + 2 new CodeEntries.
-- No Sound resources are included.
-- G3MTool 1.2.1 validation/application against clean Chapter 1 passed.
-- Pairwise merge tests with Item Giver v0.3.1 and Secret Boss Challenge v0.4.3 passed in both orders with 0 conflicts.
-- Two representative Item Giver + SBC + Trainer three-mod priority orders completed with 0 conflicts and 3 auto-merges.
+DELTAMOD
+- Native merge-aware g3mpatch.
+- Final footprint: 3 changed CodeEntries + 3 new Scripts + 3 new CodeEntries.
+- 0 deleted resources. 0 Sound resources.
+- G3MTool 1.2.1 validate/apply: PASS.
+- Item Giver v0.3.1 merge: 0 conflicts in both orders.
+- Secret Boss Challenge v0.4.3 merge: 0 conflicts in both orders.
 
-The repository connector cannot commit binary g3mpatch/ZIP files, so this text release folder stores the metadata/source used for the validated package. See HASHES.txt for exact release hashes.
+KNOWN LIMITATIONS
+- Chapter 1 / Jevil only.
+- Playlists are not persisted between launches yet.
+- Pattern names are numbered rather than descriptive.
+- Trainer keybinds are hardcoded rather than exposed in Controls.
+- Statistics do not yet include persistent records, TP, or graze analytics.
+
+See HASHES.txt for exact release hashes.
