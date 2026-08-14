@@ -1,7 +1,14 @@
-Custom Training Playlist v0.2.0
+Custom Training Playlist v0.2.1
 ===============================
 
 Chapter 1 Jevil training playlist editor + runner.
+
+v0.2.1 FIX
+- Fixed later playlist patterns beginning from the tail of the previous enemy phase.
+- The runner now requires a genuinely fresh player turn before the next playlist entry can arm.
+- Fixed stale turntimer=0 causing obj_battlecontroller to schedule scr_mnendturn() during the 12-frame startup of the next Jevil pattern.
+- The trainer now mirrors stock Jevil by holding turntimer at 120 during that startup.
+- Live regression confirmed Kris -> Susie -> Ralsei -> Jevil, with mnfight=2 / myfight=-1 / charturn=3 during the active next pattern and no command menu overlap.
 
 EDITOR CONTROLS
 - N: Open the trainer editor during safe free roam.
@@ -22,51 +29,24 @@ TRAINING CONTROLS
 - T: Restart playlist from entry 1. In single-pattern practice, restart that pattern.
 - F7: Quit training and return to the saved location.
 
-STAGES COMPLETED IN v0.2.0
-- Stage 5: Playlist Editor.
-- Stage 6: Playlist Runner.
-- Stage 7: Runtime Controls.
-- Stage 8: Trainer-Safe Defeat Handling.
-- Stage 9: Session Statistics.
-
-BEHAVIOR
-- All 16 normal Jevil patterns are available.
-- The trainer temporarily stages Kris + Susie + Ralsei in a neutral Dark World room.
-- Party turn order remains Kris -> Susie -> Ralsei -> Jevil.
-- The selected Jevil controller starts only after the stock 12-frame enemy-phase startup and after the real battle SOUL exists.
-- Multi-pattern playlists remain in one trainer battle and return through DELTARUNE's stock end-turn path between patterns.
-- Trainer defeat is intercepted before the normal Game Over flow; Retry/Skip/Restart/Quit remain available.
-- Original room, position, world state, party, HP, and saved temporary battle state are restored when training ends.
-
-SESSION RESULTS
-- Attempts
-- Patterns cleared
-- No-hit clears
-- Hits taken
-- Damage taken
-- Session time
-
-FINAL CORRECTNESS FIXES
-- Retry and Restart now correctly re-arm Jevil even in single-pattern practice.
-- Damage accounting clamps a downing hit to the character's remaining positive HP, preventing DELTARUNE's negative downed-HP bookkeeping from inflating results.
-
-RUNTIME VALIDATION
-- Playlist add/move/remove: PASS.
-- Two-pattern automatic advance: PASS.
-- Runtime Retry/Skip/Restart: PASS.
-- Trainer-safe defeat + Retry: PASS.
-- Single-pattern Retry/Restart regression: PASS.
-- F7 cleanup/return: PASS.
-- Results panel: PASS.
-- G3M apply + round-trip decompile: PASS.
+FEATURES
+- All 16 normal Jevil patterns.
+- Playlist editor + multi-pattern runner.
+- Correct Kris -> Susie -> Ralsei -> Jevil turn flow.
+- Trainer-safe defeat handling.
+- Retry / Skip / Restart / Quit controls.
+- Session results: attempts, clears, no-hit clears, hits, damage, time.
+- Original room/position/world/party/HP state restored when training ends.
 
 DELTAMOD
 - Native merge-aware g3mpatch.
 - Final footprint: 3 changed CodeEntries + 3 new Scripts + 3 new CodeEntries.
 - 0 deleted resources. 0 Sound resources.
 - G3MTool 1.2.1 validate/apply: PASS.
-- Item Giver v0.3.1 merge: 0 conflicts in both orders.
-- Secret Boss Challenge v0.4.3 merge: 0 conflicts in both orders.
+- Applied patch round-trip decompile: PASS.
+- Item Giver v0.3.1 merge: 0 conflicts both orders.
+- Secret Boss Challenge v0.4.3 merge: 0 conflicts both orders.
+- Two tested three-mod orders: 0 conflicts, 3 auto-merges.
 
 KNOWN LIMITATIONS
 - Chapter 1 / Jevil only.
