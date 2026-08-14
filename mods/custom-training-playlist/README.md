@@ -1,8 +1,22 @@
 # Custom Training Playlist
 
-**Current version: 0.2.0**
+**Current version: 0.2.1**
 
-Custom Training Playlist is a Chapter 1 practice/trainer mod for building and running custom playlists of Jevil attack patterns. Version 0.2.0 completes the recommended Stage 5–9 progression: Playlist Editor, Playlist Runner, Runtime Controls, Trainer-Safe Defeat Handling, and Session Statistics.
+Custom Training Playlist is a Chapter 1 practice/trainer mod for building and running custom playlists of Jevil attack patterns. Version 0.2.1 fixes the between-pattern turn sequencing race found in v0.2.0 while preserving the Stage 5–9 feature set: Playlist Editor, Playlist Runner, Runtime Controls, Trainer-Safe Defeat Handling, and Session Statistics.
+
+## v0.2.1 sequencing fix
+
+The next playlist entry is now hard-gated behind a genuinely fresh player phase. After a pattern ends, the runner must observe `mnfight == 0` before any later attack can arm. The trainer then waits for the party's new turn to finish before allowing the next enemy phase.
+
+The fix also mirrors stock Jevil's pre-attack timer behavior: `global.turntimer` is held at 120 during the 12-frame SOUL transition. This prevents `obj_battlecontroller` from scheduling a stale end-turn alarm that could call `scr_mnendturn()` in the middle of the next Jevil pattern and restore Kris's command UI during the attack.
+
+Live regression with all three party members kept alive confirmed:
+
+- After Kris commits: `charturn=1`, next pattern has not started.
+- After Susie commits: `charturn=2`, next pattern has not started.
+- Only after Ralsei commits does the next selected Jevil pattern start.
+- During that pattern: `mnfight=2`, `myfight=-1`, `charturn=3`; the player command phase is closed and the command menu is gone.
+- The second pattern then completes normally and the trainer returns/results flow remains intact.
 
 ## Playlist editor
 
@@ -17,78 +31,41 @@ Press **N** during safe Chapter 1 free roam to open the editor.
 - **P** — practice the highlighted pattern immediately.
 - **S** — start the complete playlist from entry 1.
 - **X / Escape** — close the editor.
-- Playlist capacity is currently **32 entries**.
+- Playlist capacity: **32 entries**.
 
 All 16 normal Jevil patterns are available.
-
-## Playlist runner
-
-The trainer saves the original room, position, world mode, party, HP/max HP, character-control state, and relevant temporary battle state. It then stages practice in a neutral Dark World room with **Kris + Susie + Ralsei** and all three normal player turns enabled.
-
-A playlist stays inside one trainer battle. After each selected attack finishes, DELTARUNE's stock end-turn path returns to the next player-command phase before the trainer advances to the next playlist entry. The selected Jevil controller is started only after the stock 12-frame enemy-phase startup and after the real battle SOUL exists.
-
-When training ends, the original room, coordinates, world mode, party, HP, and saved battle state are restored.
 
 ## Runtime controls
 
 During training:
 
-- **R** — retry the current pattern.
-- **K** — skip the current pattern. On a final/single pattern this ends training.
-- **T** — restart the playlist from entry 1. In single-pattern practice this restarts the current pattern.
-- **F7** — quit training and return to the saved location.
+- **R** — Retry current pattern.
+- **K** — Skip current pattern.
+- **T** — Restart playlist; in single-pattern practice, restart that pattern.
+- **F7** — Quit training and return to the saved location.
 
-## Trainer-safe defeat handling
+## Trainer-safe defeat / statistics
 
-A full training-party wipe is intercepted before DELTARUNE enters its normal Game Over flow. The active pattern is stopped, the temporary party is restored to its pattern-start HP, and the trainer waits for one of the normal training controls:
-
-- R — Retry
-- K — Skip
-- T — Restart
-- F7 — Quit
-
-## Session statistics
-
-After training returns to the original room, a results panel reports:
-
-- Attempts
-- Patterns cleared
-- No-hit clears
-- Hits taken
-- Damage taken
-- Session time
-
-Damage accounting measures positive HP lost and excludes DELTARUNE's negative downed-HP bookkeeping from inflating the result.
-
-## Runtime validation
-
-The final v0.2.0 candidate was built from clean Chapter 1 and tested under Wine/Xvfb using real X11 XTEST input. Validation includes editor add/move/remove behavior, a multi-entry playlist transition, Retry/Restart, trainer-safe defeat + Retry, F7 cleanup/return, the results panel, and final regressions for Retry/Restart in single-pattern practice.
-
-The final applied patch also re-opened/decompiled with all trainer hooks and fixes intact.
+Training party wipes are intercepted before normal Game Over. Retry / Skip / Restart / Quit remain available. The results panel reports attempts, patterns cleared, no-hit clears, hits taken, damage taken, and session time.
 
 ## Deltamod compatibility
 
 - Package ID: `github.customtrainingplaylist.gladiatorgaming`
 - Target: DELTARUNE v23, Chapter 1
 - Native merge-aware `g3mpatch`
-- Final patch footprint: **3 changed CodeEntries + 3 new Scripts + 3 new CodeEntries**
-- Changed existing CodeEntries:
-  - `gml_Object_obj_time_Step_1`
-  - `gml_Object_obj_time_Draw_64`
-  - `gml_GlobalScript_scr_damage`
-- **0 deleted resources** and **0 Sound resources**.
-- G3MTool 1.2.1 validation/application against clean Chapter 1 passed.
-- Item Giver v0.3.1 + Trainer: **0 conflicts** in both priority orders.
-- Secret Boss Challenge v0.4.3 + Trainer: **0 conflicts** in both priority orders.
-- Two tested Item Giver + Secret Boss Challenge + Trainer priority orders: **0 conflicts, 3 auto-merges**.
-
-Deltamod 2.0.4 applies CSX patches after the G3M merge stage, so a later third-party CSX targeting the same chapter can still supersede previously merged G3M output.
+- Final footprint: **3 changed CodeEntries + 3 new Scripts + 3 new CodeEntries**
+- **0 deleted resources**, **0 Sound resources**
+- G3MTool 1.2.1 validate/apply: PASS
+- Applied patch round-trip decompile: PASS
+- Item Giver v0.3.1 + Trainer: **0 conflicts** both orders
+- Secret Boss Challenge v0.4.3 + Trainer: **0 conflicts** both orders
+- Two tested three-mod priority orders: **0 conflicts, 3 auto-merges**
 
 ## Release hashes
 
 - Clean Chapter 1 SHA-256: `82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70`
-- Final Chapter 1 G3M SHA-256: `eab7b95391d116cd7757b8d7a1fae953b3642655cb6a7fb104afe92bdda6e1b8`
-- Final v0.2.0 Deltamod ZIP SHA-256: `d449f3b7d0cdf0620653165bb3fbba6e8f13c4a69668b5e58c625704cd8d909a`
+- Final Chapter 1 G3M SHA-256: `6366c3b2c94c863ecbf981a961221e771254906fc12aa21357a376c7256d5f92`
+- Final v0.2.1 Deltamod ZIP SHA-256: `1918ab0d75a7318294ff6ea35c245adae0cdfa50262e28e7a6ad386d41f9f66f`
 
 ## Remaining limitations
 
