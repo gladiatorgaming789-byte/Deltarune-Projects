@@ -1,67 +1,102 @@
 # Custom Training Playlist
 
-**Current version: 0.1.9 POC**
+**Current version: 0.2.0**
 
-Custom Training Playlist is a DELTARUNE trainer project intended to grow into a system for chaining practice patterns. Version 0.1.9 completes Stage 4 of the proof of concept by adding an in-game Jevil attack browser on top of the runtime-confirmed v0.1.8 battle lifecycle.
+Custom Training Playlist is a Chapter 1 practice/trainer mod for building and running custom playlists of Jevil attack patterns. Version 0.2.0 completes the recommended Stage 5–9 progression: Playlist Editor, Playlist Runner, Runtime Controls, Trainer-Safe Defeat Handling, and Session Statistics.
 
-## Stage 4 behavior
+## Playlist editor
 
-- Press **N** during safe Chapter 1 free roam to open the trainer browser in the current room.
-- Use **Up / Down** to move through the current page.
-- Use **Left / Right** to switch between Patterns 1–8 and 9–16.
-- Press **Z** or **Enter** to start the selected pattern.
-- Press **X**, **Escape**, or **N** to close the browser without entering training.
-- Press **F7** during an active trainer battle to abort and return to the saved location.
-- All **16 normal Jevil attack IDs** mapped by the existing adapter are exposed.
+Press **N** during safe Chapter 1 free roam to open the editor.
 
-When a pattern is confirmed, the trainer saves the current room, Kris position, world mode, party, HP, character-control state, and relevant temporary battle state. It moves to the neutral `room_DARKempty`, enters Dark World mode, temporarily supplies Kris + Susie + Ralsei, runs the normal party turn, starts the selected Jevil pattern only after all three party members finish their actions, then restores the original room, position, world mode, party, and saved state.
+- **Left / Right** — switch between the Pattern catalog and Playlist panes.
+- **Up / Down** — move the highlighted entry.
+- **Z / Enter** — add the highlighted Jevil pattern to the playlist.
+- **Delete / Backspace** — remove the highlighted playlist entry.
+- **Q / E** — move a playlist entry up / down.
+- **C** — clear the playlist.
+- **P** — practice the highlighted pattern immediately.
+- **S** — start the complete playlist from entry 1.
+- **X / Escape** — close the editor.
+- Playlist capacity is currently **32 entries**.
+
+All 16 normal Jevil patterns are available.
+
+## Playlist runner
+
+The trainer saves the original room, position, world mode, party, HP/max HP, character-control state, and relevant temporary battle state. It then stages practice in a neutral Dark World room with **Kris + Susie + Ralsei** and all three normal player turns enabled.
+
+A playlist stays inside one trainer battle. After each selected attack finishes, DELTARUNE's stock end-turn path returns to the next player-command phase before the trainer advances to the next playlist entry. The selected Jevil controller is started only after the stock 12-frame enemy-phase startup and after the real battle SOUL exists.
+
+When training ends, the original room, coordinates, world mode, party, HP, and saved battle state are restored.
+
+## Runtime controls
+
+During training:
+
+- **R** — retry the current pattern.
+- **K** — skip the current pattern. On a final/single pattern this ends training.
+- **T** — restart the playlist from entry 1. In single-pattern practice this restarts the current pattern.
+- **F7** — quit training and return to the saved location.
+
+## Trainer-safe defeat handling
+
+A full training-party wipe is intercepted before DELTARUNE enters its normal Game Over flow. The active pattern is stopped, the temporary party is restored to its pattern-start HP, and the trainer waits for one of the normal training controls:
+
+- R — Retry
+- K — Skip
+- T — Restart
+- F7 — Quit
+
+## Session statistics
+
+After training returns to the original room, a results panel reports:
+
+- Attempts
+- Patterns cleared
+- No-hit clears
+- Hits taken
+- Damage taken
+- Session time
+
+Damage accounting measures positive HP lost and excludes DELTARUNE's negative downed-HP bookkeeping from inflating the result.
 
 ## Runtime validation
 
-The final production patch was applied to clean Chapter 1 and exercised under Wine/Xvfb with real X11 keyboard input.
+The final v0.2.0 candidate was built from clean Chapter 1 and tested under Wine/Xvfb using real X11 XTEST input. Validation includes editor add/move/remove behavior, a multi-entry playlist transition, Retry/Restart, trainer-safe defeat + Retry, F7 cleanup/return, the results panel, and final regressions for Retry/Restart in single-pattern practice.
 
-Validated Stage 4 behavior includes:
-
-1. N opens the browser in a Light World room without moving Kris.
-2. Page 1 displays Patterns 1–8.
-3. Right switches to Page 2 and selection movement reaches Pattern 10.
-4. N cancel closes the browser and returns to free roam without launching training.
-5. Pattern 10 selection reaches internal adapter ID 9 and Jevil controller type 48.
-6. Pattern 1 completes the full lifecycle: browser selection → neutral Dark World room → Kris/Susie/Ralsei turn → Jevil attack → cleanup → original Light World room/position restored.
-7. The game process remains alive after the successful round trip.
-
-A first Stage 4 build exposed a GameMaker local-variable metadata failure in the Draw helper. The final browser Draw helper therefore uses no local temporary variables. The browser hook was also moved from Draw GUI End to Draw GUI after G3M merge testing found that Item Giver v0.3.1 also modifies Draw GUI End.
+The final applied patch also re-opened/decompiled with all trainer hooks and fixes intact.
 
 ## Deltamod compatibility
 
 - Package ID: `github.customtrainingplaylist.gladiatorgaming`
 - Target: DELTARUNE v23, Chapter 1
 - Native merge-aware `g3mpatch`
-- Final patch footprint: **2 changed CodeEntries + 3 new Scripts + 3 new CodeEntries**
+- Final patch footprint: **3 changed CodeEntries + 3 new Scripts + 3 new CodeEntries**
 - Changed existing CodeEntries:
   - `gml_Object_obj_time_Step_1`
   - `gml_Object_obj_time_Draw_64`
-- No Sound resources are included.
-- G3MTool 1.2.1 validation and application against clean Chapter 1 passed.
-- Item Giver v0.3.1 and the trainer merge in both priority orders with **0 conflicts**.
-- Secret Boss Challenge v0.4.3 and the trainer merge in both priority orders with **0 conflicts**.
+  - `gml_GlobalScript_scr_damage`
+- **0 deleted resources** and **0 Sound resources**.
+- G3MTool 1.2.1 validation/application against clean Chapter 1 passed.
+- Item Giver v0.3.1 + Trainer: **0 conflicts** in both priority orders.
+- Secret Boss Challenge v0.4.3 + Trainer: **0 conflicts** in both priority orders.
+- Two tested Item Giver + Secret Boss Challenge + Trainer priority orders: **0 conflicts, 3 auto-merges**.
 
-Deltamod 2.0.4 applies CSX patches after its G3M merge stage, so a third-party CSX that overwrites the same resources can still supersede G3M-merged output.
+Deltamod 2.0.4 applies CSX patches after the G3M merge stage, so a later third-party CSX targeting the same chapter can still supersede previously merged G3M output.
 
 ## Release hashes
 
 - Clean Chapter 1 SHA-256: `82c2bb61b8d78cd287120f6301588fecba34ec5a890bac711b7a8774c760ec70`
-- Final Chapter 1 G3M SHA-256: `f8037e06c9989b718104dc613d1aacb6414ce3013f771f3efbc2c8d773568d0e`
-- Final v0.1.9 Deltamod ZIP SHA-256: `b7a2a374009be0388785630705114a17734f2053688e1a4569398b474c8a125a`
+- Final Chapter 1 G3M SHA-256: `eab7b95391d116cd7757b8d7a1fae953b3642655cb6a7fb104afe92bdda6e1b8`
+- Final v0.2.0 Deltamod ZIP SHA-256: `d449f3b7d0cdf0620653165bb3fbba6e8f13c4a69668b5e58c625704cd8d909a`
 
-## Remaining POC limitations
+## Remaining limitations
 
-- This is an individual-attack browser, not the playlist editor yet.
-- Only Jevil is currently exposed.
-- Not all 16 patterns have received a full natural-completion gameplay pass yet.
-- A dedicated trainer death/game-over policy is not implemented yet. If the party is defeated before F7 is used, normal DELTARUNE game-over behavior may take over.
-- N is hardcoded rather than configurable through Controls.
-- Returning reloads the original room before restoring position, so purely room-local transient state may be recreated.
-- Chapters 2–5 are not yet supported by this trainer POC.
+- Chapter 1 / Jevil only.
+- Playlists are session-only and are not saved between game launches yet.
+- Patterns are numbered rather than given descriptive names.
+- Trainer keybinds are hardcoded rather than exposed in Controls.
+- Statistics do not yet include persistent records, TP metrics, or graze analytics.
+- Returning to the source location reloads that room, so purely transient room-local state may be recreated.
 
 This is an unofficial fan mod and is not affiliated with or endorsed by Toby Fox or the DELTARUNE development team.
