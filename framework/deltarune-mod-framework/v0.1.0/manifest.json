@@ -1,0 +1,20 @@
+{
+  "framework": "deltarune-mod-framework",
+  "version": "0.1.0",
+  "target": "DELTARUNE v23 / Chapter 1",
+  "apis": ["mod_registry", "capability_registry", "event_bus"],
+  "runtime_code_entries": 5,
+  "resources_added": {
+    "sprites": 0,
+    "sounds": 0,
+    "rooms": 0,
+    "fonts": 0,
+    "objects": 0,
+    "scripts": 5
+  },
+  "deltamod": {
+    "native_g3mpatch": true,
+    "story_progression_changes": false
+  },
+  "status": "source_implementation_pending_runtime_patch_validation"
+}
