@@ -66,7 +66,8 @@ function DMF_Event_Emit(event_name, payload) {
     var listeners = variable_struct_get(global.dmf.events, event_name);
     var delivered = 0;
     var cancelled = false;
-    var snapshot = array_copy(listeners, 0, array_length(listeners));
+    var snapshot = [];
+    array_copy(snapshot, 0, listeners, 0, array_length(listeners));
 
     for (var i = 0; i < array_length(snapshot); i++) {
         var listener = snapshot[i];
