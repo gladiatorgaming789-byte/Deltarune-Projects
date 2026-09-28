@@ -112,8 +112,7 @@ DCE_UI_Draw();
 // Return complete custom stats when Full Dojo asks for a custom enemy by ID.
 // The replace is performed against the root global script so UTMT can preserve
 // the existing anonymous-function code entries.
-string dceGenerateSearch = "function scr_dm_generate_enemy(arg0 = 5)
-{";
+string dceGenerateSearch = "function scr_dm_generate_enemy(arg0 = 5)\\n{";
 string dceGenerateReplacement = @"function scr_dm_generate_enemy(arg0 = 5)
 {
     var __dce_generated = DCE_FindEnemy(argument0);
