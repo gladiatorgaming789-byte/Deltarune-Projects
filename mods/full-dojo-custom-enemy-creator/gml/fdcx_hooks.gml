@@ -27,7 +27,7 @@ function fdcx_current_custom_enemy(){
     for(var i=0;i<array_length(global.fdcx_custom_enemies);i++){var _enemy=global.fdcx_custom_enemies[i];if(is_struct(_enemy)&&fdcx_custom_type_id(_enemy.id)==_type)return _enemy;}return undefined;
 }
 function fdcx_custom_enemy_step(){
-    var _enemy=fdcx_current_custom_enemy();if(!is_struct(_enemy))return false;if(global.monster[myself]!=1)return true;
+    var _enemy=fdcx_current_custom_enemy();if(!is_struct(_enemy))return false;if(global.monster[myself]!=1)return true;\n    if(is_struct(global.fdcx_runtime_attack))fdcx_runtime_step();
     if(scr_isphase("enemytalk")&&!talked){global.typer=50;global.battlemsg[0]="* "+_enemy.name+" prepares an attack.";talked=1;}
     if(global.mnfight==1.5&&scr_attackpriority(1)){if(!instance_exists(obj_growtangle))instance_create(camerax()+320,cameray()+170,obj_growtangle);if(!instance_exists(obj_moveheart))scr_moveheart();global.mnfight=2;scr_turntimer(90);}
     if(scr_isphase("bullets")&&!attacked){attacked=1;var _count=max(1,array_length(_enemy.attacks)),_attack_index=turns mod _count;if(fdcx_runtime_start(_enemy,_attack_index)){global.monsterattackname[myself]="FDCX_"+_enemy.id;var _attack=global.fdcx_runtime_attack;scr_turntimer(variable_struct_exists(_attack,"duration")?_attack.duration+30:210);}else scr_turntimer(30);turns++;}
