@@ -1,39 +1,40 @@
 /// DCE_AddBuiltinStep(attack, type, time)
-/// Adds a safe built-in attack primitive.
+/// Adds a built-in timeline primitive backed by native Dojo attack controllers.
 
 var _data = {};
 
 switch (argument1) {
     case "wait":
+        _data.duration = 1;
         break;
 
     case "aimed":
-        _data.speed = 4;
+        _data.native_type = 0;
+        _data.duration = 60;
         _data.damage = 10;
-        _data.angle_offset = 0;
         break;
 
     case "radial":
-        _data.count = 8;
-        _data.speed = 3;
+        _data.native_type = 31;
+        _data.duration = 60;
         _data.damage = 10;
-        _data.rotation = 0;
         break;
 
     case "horizontal":
-        _data.speed = 4;
+        _data.native_type = 30;
+        _data.duration = 60;
         _data.damage = 10;
         break;
 
     case "vertical":
-        _data.speed = 4;
+        _data.native_type = 1;
+        _data.duration = 60;
         _data.damage = 10;
         break;
 
     case "burst":
-        _data.count = 5;
-        _data.speed = 4;
-        _data.spread = 12;
+        _data.native_type = 4;
+        _data.duration = 45;
         _data.damage = 10;
         break;
 
