@@ -1,0 +1,19 @@
+{
+  "id": "full-dojo-enemy-editor",
+  "name": "Full Dojo Enemy Editor",
+  "version": "0.1.0",
+  "dependency": {
+    "id": "full-dojo-customizer",
+    "version": "0.14"
+  },
+  "target": "DELTARUNE Chapter 4 / Full Dojo Customizer v0.14",
+  "deltamod": {
+    "native_g3mpatch": true,
+    "story_progression_changes": false
+  },
+  "resources": {
+    "sounds_added": 0,
+    "rooms_added": 0
+  },
+  "custom_enemy_id_base": 10000
+}
