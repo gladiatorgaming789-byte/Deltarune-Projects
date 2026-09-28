@@ -1,0 +1,9 @@
+{
+  "id": "full-dojo-custom-enemy-creator",
+  "version": "0.1.0-dev",
+  "target_mod": { "id": "full-dojo-customizer", "version": "v0.14" },
+  "target_game": "DELTARUNE Chapter 1-5",
+  "description": "Adds custom enemy creation and a combined visual/timeline attack editor to Full Dojo Customizer.",
+  "deltamod": { "required": true, "native_g3mpatch": true },
+  "resources": { "new_sprites": 0, "new_sounds": 0, "new_rooms": 0, "new_fonts": 0, "new_objects": 1, "new_scripts": 0, "changed_code_entries": "pending" }
+}
